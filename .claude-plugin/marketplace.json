@@ -1,0 +1,13 @@
+{
+  "name": "claude-market-gamedev",
+  "owner": {
+    "name": "hproof"
+  },
+  "plugins": [
+    {
+      "name": "code-analyzer",
+      "source": "./plugins/code-analyzer",
+      "description": "代码分析器插件，用于分析代码库架构"
+    }
+  ]
+}
