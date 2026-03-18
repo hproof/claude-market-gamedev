@@ -1,6 +1,6 @@
 ---
 name: code-analyzer
-description: "Use this agent when需要深入分析代码库架构并生成架构文档时。适用于：新成员入职了解项目、代码审查前的架构评估、技术债务分析、重构前的架构梳理、技术分享文档准备。\n\n<example>\nContext: 用户需要了解 battlefield 模块的代码架构，以便进行后续开发。\nuser: \"请帮我分析一下 build/battlefield 目录的代码架构\"\nassistant: \"我将使用代码架构分析代理来深入分析 battlefield 模块的代码结构\"\n<commentary>\n由于用户需要全面了解 battlefield 模块的架构设计，使用 code-analyzer 代理来生成详细的架构分析文档。\n</commentary>\n</example>\n\n<example>\nContext: 用户想要了解 standard 工具库的模块划分和关键类。\nuser: \"standard 目录下有哪些工具类？它们之间是什么关系？\"\nassistant: \"我将启动代码架构分析代理来梳理 standard 工具库的模块结构\"\n<commentary>\n用户需要了解 standard 目录的工具类架构，使用 code-analyzer 代理生成结构化的架构文档。\n</commentary>\n</example>"
+description: 代码架构分析专家。当需要深入分析代码库结构、生成架构文档、理解模块设计或评估代码组织时使用。
 model: inherit
 color: orange
 memory: project

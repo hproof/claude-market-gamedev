@@ -1,9 +1,8 @@
 {
-    "name": "code-analyzer",
-    "description": "代码分析器插件，用于深入分析代码库架构并生成架构文档",
-    "version": "1.0.0",
-    "author": {
-        "name": "hproof"
-    },
-    "agents": ["code-analyzer"]
+  "name": "code-analyzer",
+  "description": "代码分析器插件，用于深入分析代码库架构并生成架构文档",
+  "version": "1.0.0",
+  "author": {
+    "name": "hproof"
+  }
 }
