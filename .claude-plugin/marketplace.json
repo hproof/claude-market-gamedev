@@ -8,6 +8,11 @@
       "name": "code-analyzer",
       "source": "./plugins/code-analyzer",
       "description": "代码分析器插件，用于分析代码库架构"
+    },
+    {
+      "name": "hello",
+      "source": "./plugins/hello",
+      "description": "简单的问候插件，向用户问好并显示系统信息"
     }
   ]
 }
