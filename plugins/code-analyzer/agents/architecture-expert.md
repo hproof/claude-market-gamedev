@@ -94,12 +94,15 @@ memory: project
 - 格式：`[显示文本](file_path:line_number)`
 - 示例：`[GameManager::Init](src/core/manager.cpp:45)`
 
-## 执行流程
+## 输出要求
 
+**保存路径**：由调用方提供，格式为 `./docs/{日期}-architecture-{模块}.md`
+
+执行步骤：
 1. 使用 Glob 搜索目标目录的源文件
 2. 分析目录结构和模块划分
 3. 读取核心类和接口文件
 4. 识别设计模式应用
 5. 分析依赖关系
 6. 生成审查报告
-7. 保存报告到 `docs/[模块名]-architecture-[日期].md`
+7. **保存报告到指定路径**（确保 `./docs/` 目录存在）

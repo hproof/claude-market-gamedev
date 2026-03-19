@@ -56,6 +56,28 @@ memory: project
 Agent 指令内容...
 ```
 
+### 4. Skill 定义 `skills/{skill-name}/SKILL.md`
+
+**必须以 YAML 前置元数据开头**，包含 name 和 description：
+
+```yaml
+---
+name: skill名称
+description: |
+  Skill 的简要描述。
+  触发条件说明（当用户输入 /xxx 或说"xxx"时触发）。
+  适用场景说明。
+---
+
+Skill 使用说明和执行逻辑...
+```
+
+**YAML 字段说明：**
+- `name` - Skill 标识符（必需），与目录名保持一致
+- `description` - Skill 描述（必需），支持多行，包含触发条件和适用场景
+
+**注意：** YAML 前置元数据以 `---` 开始和结束，这是解析 Skill 的关键标记。
+
 ## 开发工作流
 
 1. 在 `plugins/` 下创建新目录

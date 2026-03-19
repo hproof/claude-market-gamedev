@@ -141,10 +141,13 @@ memory: project
 
 所有关键代码引用使用格式：`[显示文本](file_path:line_number)`
 
-## 执行流程
+## 输出要求
 
+**保存路径**：由调用方提供，格式为 `./docs/{日期}-object-{模块}.md`
+
+执行步骤：
 1. 搜索对象相关源文件（Entity、Component、System、GameObject、ObjectPool、Serializer等关键词）
 2. 分析ECS架构或传统对象模型
 3. 审查生命周期管理、对象池、引用管理实现
 4. 评估序列化和反射系统
-5. 生成审查报告保存到 `docs/[模块名]-object-[日期].md`
+5. **保存报告到指定路径**（确保 `./docs/` 目录存在）

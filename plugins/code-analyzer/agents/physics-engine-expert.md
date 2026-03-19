@@ -161,10 +161,13 @@ memory: project
 
 所有关键代码引用使用格式：`[显示文本](file_path:line_number)`
 
-## 执行流程
+## 输出要求
 
+**保存路径**：由调用方提供，格式为 `./docs/{日期}-physics-{模块}.md`
+
+执行步骤：
 1. 搜索物理相关源文件（Physics、RigidBody、Collision、Constraint、Character等关键词）
 2. 分析物理引擎架构和核心类
 3. 审查碰撞检测、动力学、约束求解实现
 4. 评估角色控制、场景查询、性能优化
-5. 生成审查报告保存到 `docs/[模块名]-physics-[日期].md`
+5. **保存报告到指定路径**（确保 `./docs/` 目录存在）
