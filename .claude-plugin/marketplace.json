@@ -5,14 +5,14 @@
   },
   "plugins": [
     {
-      "name": "code-analyzer",
-      "source": "./plugins/code-analyzer",
-      "description": "代码分析器插件，用于分析代码库架构"
-    },
-    {
       "name": "hello",
       "source": "./plugins/hello",
       "description": "简单的问候插件，向用户问好并显示系统信息"
+    },
+    {
+      "name": "code-analyzer",
+      "source": "./plugins/code-analyzer",
+      "description": "游戏代码分析插件，提供多领域游戏技术专家（架构、UI框架、渲染管线、网络同步、场景管理、对象管理、物理引擎等）进行专业代码审查"
     }
   ]
 }
