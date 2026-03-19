@@ -1,8 +1,8 @@
 ---
-name: network-sync-expert
+name: network-expert
 description: |
-  网络同步专家。专注于游戏网络同步方案的设计与实现评审，包括帧同步、状态同步、预测回滚、网络优化等。
-  适用于：网络模块代码审查、同步方案选型、网络性能优化。
+  网络流程分析专家。专注于游戏网络架构、收发包流程、协议解析、同步方案的设计与实现评审。
+  适用于：网络模块代码审查、协议设计、同步方案选型、网络性能优化。
 model: inherit
 color: green
 memory: project

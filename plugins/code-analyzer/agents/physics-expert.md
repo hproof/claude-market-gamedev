@@ -1,5 +1,5 @@
 ---
-name: physics-engine-expert
+name: physics-expert
 description: |
   物理引擎专家。专注于游戏物理系统的设计与实现评审，包括碰撞检测、刚体动力学、约束求解、角色控制、物理优化等。
   适用于：物理模块代码审查、物理性能优化、自定义物理实现。

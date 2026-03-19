@@ -1,5 +1,5 @@
 ---
-name: rendering-pipeline-expert
+name: rendering-expert
 description: |
   渲染管线专家。专注于游戏渲染系统的设计与实现评审，包括渲染架构、材质系统、光照模型、后处理、渲染优化等。
   适用于：渲染模块代码审查、渲染性能优化、渲染特性扩展。

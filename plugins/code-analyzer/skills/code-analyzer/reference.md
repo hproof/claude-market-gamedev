@@ -103,10 +103,12 @@
 
 | 领域 | 标识 | 核心关注点 | 典型文件关键词 |
 |------|------|-----------|---------------|
-| 架构 | architecture | 模块划分、依赖关系、设计模式 | core, framework, manager |
-| UI框架 | ui | 事件系统、布局、动画、资源 | ui, view, widget, canvas |
+| 代码结构 | code-structure | 目录结构、模块分布、依赖关系 | 目录浏览、结构分析 |
+| 代码质量 | code-quality | 可读性、可维护性、扩展性 | 代码审查、质量评估 |
+| 游戏流程 | game-flow | 初始化、主循环、各阶段流程 | gameloop, update, init, tick |
+| 对象管理 | object | 生命周期、指令处理、AI执行 | entity, gameobject, ai, command |
+| 场景管理 | scene | 生命周期、切换、事件通知 | scene, level, world, map |
 | 渲染管线 | rendering | Shader、光照、后处理、性能 | render, shader, material |
-| 网络同步 | network | 帧同步、状态同步、预测回滚 | network, sync, server |
-| 场景管理 | scene | 场景图、流式加载、大世界 | scene, level, world, chunk |
-| 对象管理 | object | ECS、对象池、序列化 | entity, component, ecs |
+| 网络流程 | network | 收发包、协议、同步方案 | network, sync, socket, server |
 | 物理引擎 | physics | 碰撞检测、刚体、角色控制 | physics, collision, rigidbody |
+| UI框架 | ui | 事件系统、布局、动画、资源 | ui, view, widget, canvas |
