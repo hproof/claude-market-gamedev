@@ -1,8 +1,9 @@
 {
   "name": "code-analyzer",
-  "description": "代码分析器插件，用于深入分析代码库架构并生成架构文档",
-  "version": "1.0.0",
+  "description": "代码分析器插件，用于深入分析代码库架构并生成架构文档。支持游戏项目技术栈分析（渲染管线、同步方式、场景管理、对象管理等）",
+  "version": "1.1.0",
   "author": {
     "name": "hproof"
-  }
+  },
+  "agents": ["code-analyzer"]
 }
