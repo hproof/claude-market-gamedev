@@ -1,6 +1,6 @@
 {
   "name": "code-analyzer",
-  "description": "游戏代码分析插件，提供快速项目扫描和专项深度分析（渲染、网络、物理、UI等）",
+  "description": "游戏代码分析插件，支持整体扫描（模块分布与层级）、结构分析（类关系与依赖）、流程分析（初始化与主循环追踪）",
   "version": "2.0.0",
   "author": {
     "name": "hproof"

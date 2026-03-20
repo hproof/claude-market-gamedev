@@ -1,92 +1,108 @@
 # CLAUDE.md
 
-游戏开发 Claude Code 插件市场配置指南。
+游戏开发 Claude Code 插件市场。
 
 ## 项目结构
 
 ```
-.claude-plugin/marketplace.json    # 市场配置
-plugins/                           # 插件目录
-└── {plugin-name}/                 # 单个插件
-    ├── .claude-plugin/plugin.json # 插件配置
-    ├── agents/                    # Agent 定义目录（自动发现）
-    └── skills/                    # Skill 定义目录（自动发现）
+.claude-plugin/marketplace.json       # 市场配置（注册所有插件）
+plugins/{plugin-name}/
+├── .claude-plugin/plugin.json        # 插件元数据
+├── agents/{agent-name}.md            # Agent 定义（自动发现）
+├── skills/{skill-name}/SKILL.md      # Skill 定义（自动发现）
+└── docs/                             # 插件文档（可选）
 ```
 
 ## 配置规范
 
-### 1. 市场配置 `.claude-plugin/marketplace.json`
+### marketplace.json
 
 ```json
 {
-  "name": "claude-market-gamedev",
-  "owner": { "name": "hproof" },
+  "name": "市场名称",
+  "owner": { "name": "作者" },
   "plugins": [
-    {
-      "name": "插件名称",
-      "source": "./plugins/插件目录",
-      "description": "插件描述"
-    }
+    { "name": "插件名", "source": "./plugins/目录", "description": "描述" }
   ]
 }
 ```
 
-### 2. 插件配置 `plugins/{name}/.claude-plugin/plugin.json`
+### plugin.json
 
 ```json
 {
-  "name": "插件名称",
-  "description": "插件描述",
+  "name": "插件名",
+  "description": "描述",
   "version": "1.0.0",
   "author": { "name": "作者" }
 }
 ```
 
-### 3. Agent 定义 `agents/{agent-name}.md`
+### Skill 定义
 
 ```yaml
 ---
-name: agent名称
-description: 使用说明
-model: inherit
-color: orange
-memory: project
----
-
-Agent 指令内容...
-```
-
-### 4. Skill 定义 `skills/{skill-name}/SKILL.md`
-
-**必须以 YAML 前置元数据开头**，包含 name 和 description：
-
-```yaml
----
-name: skill名称
+name: skill-name
 description: |
-  Skill 的简要描述。
-  触发条件说明（当用户输入 /xxx 或说"xxx"时触发）。
-  适用场景说明。
+  做什么、何时触发、适用场景。
+allowed-tools: Read, Write, Glob, Grep, Bash(find *)
 ---
 
-Skill 使用说明和执行逻辑...
+Skill 指令内容...
 ```
 
-**YAML 字段说明：**
-- `name` - Skill 标识符（必需），与目录名保持一致
-- `description` - Skill 描述（必需），支持多行，包含触发条件和适用场景
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `name` | 推荐 | 标识符，与目录名一致。省略则用目录名 |
+| `description` | 推荐 | Claude 据此判断何时使用该 Skill |
+| `allowed-tools` | 否 | Skill 激活时免审批的工具列表 |
+| `disable-model-invocation` | 否 | `true` 则只能用户手动 `/name` 触发 |
+| `context` | 否 | `fork` 在独立子上下文中执行 |
+| `agent` | 否 | `context: fork` 时使用的 Agent 类型 |
 
-**注意：** YAML 前置元数据以 `---` 开始和结束，这是解析 Skill 的关键标记。
+### Agent 定义
 
-## 开发工作流
+```yaml
+---
+name: agent-name
+description: 何时委派给此 Agent
+model: inherit
+tools: Read, Write, Glob, Grep, Skill(my-skill *)
+---
 
-1. 在 `plugins/` 下创建新目录
-2. 创建 `.claude-plugin/plugin.json` 配置文件
-3. 创建 `agents/` 或 `skills/` 目录并添加定义文件
-4. 更新 `.claude-plugin/marketplace.json` 注册新插件
-
-## 验证配置
-
-```bash
-node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json'))" && echo "Valid JSON"
+Agent 系统提示...
 ```
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `name` | 是 | 唯一标识符，小写字母和连字符 |
+| `description` | 是 | Claude 据此决定何时委派 |
+| `model` | 否 | `sonnet` / `opus` / `haiku` / `inherit` |
+| `tools` | 否 | 可用工具白名单，省略则继承全部 |
+| `disallowedTools` | 否 | 工具黑名单 |
+| `memory` | 否 | `project` 启用跨会话记忆 |
+| `skills` | 否 | 启动时预加载的 Skill 列表 |
+| `maxTurns` | 否 | 最大执行轮数 |
+
+**插件 Agent 限制：** 不支持 `hooks`、`mcpServers`、`permissionMode` 字段。
+
+### 工具权限格式
+
+```
+Tool                    # 匹配该工具所有调用
+Tool(specifier)         # 精确匹配
+Tool(prefix *)          # 通配符匹配
+```
+
+常用示例：
+
+| 格式 | 含义 |
+|------|------|
+| `Read` | 读取任意文件 |
+| `Write` | 写入任意文件 |
+| `Glob` | 文件名搜索 |
+| `Grep` | 内容搜索 |
+| `Bash(find *)` | 执行 find 命令 |
+| `Bash(wc *)` | 执行 wc 命令 |
+| `Agent(name)` | 调用指定 Agent |
+| `Skill(name *)` | 调用指定 Skill |
