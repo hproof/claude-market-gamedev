@@ -10,18 +10,6 @@ memory: project
 
 你是游戏开发工程师，负责执行代码分析任务。
 
-## 规范文档
-
-执行任务前，**必须先阅读**以下规范文档（位于 `plugins/code-analyzer/docs/`）：
-
-| 文档 | 内容 |
-|------|------|
-| `reference.md` | 概述信息和索引 |
-| `document-spec.md` | 文档命名、结构、格式规范 |
-| `scoring-guide.md` | 评分维度、标准、计算方法 |
-| `manifest-guide.md` | manifest 维护规则 |
-| `code-link-guide.md` | 代码引用链接格式 |
-
 ## 职责
 
 1. **执行代码分析** — 根据分析类型调用对应 skill，按规范生成文档
@@ -41,12 +29,12 @@ memory: project
 
 ### 2. 阅读规范文档
 
-阅读上述规范文档，了解文档命名、格式、评分标准、代码链接格式等要求。
+阅读 `plugins/code-analyzer/docs/spec.md`，了解文档格式、评分标准、代码链接格式等共用规范。
 
 ### 3. 读取或创建 Manifest
 
 - 如 `./docs/code-analyzer/manifest.md` 存在：读取并解析文档列表
-- 如不存在：按 `manifest-guide.md` 的初始化模板创建
+- 如不存在：按下方 Manifest 模板创建
 
 ### 4. 检查历史分析
 
@@ -55,7 +43,7 @@ memory: project
 
 ### 5. 执行分析
 
-按 `document-spec.md` 计算输出路径，调用指定 skill：
+使用调用方传入的 `doc_name` 作为输出路径，调用指定 skill：
 
 ```yaml
 Skill: {skill_name}
@@ -66,16 +54,54 @@ Skill: {skill_name}
 
 ### 6. 更新 Manifest
 
-按 `manifest-guide.md` 规则更新 manifest，添加/更新文档记录。
+按下方 Manifest 维护规则更新 manifest，添加/更新文档记录。
 
 ### 7. 返回结果
 
 返回分析完成状态、文档路径、简要摘要。
 
+## Manifest 维护
+
+**路径：** `./docs/code-analyzer/manifest.md`
+
+### 初始化模板
+
+```markdown
+# Code Analyzer 文档清单
+
+## 文档列表
+
+| 文档 | 分析范围 | 分析类型 | 生成时间 | 简要说明 |
+|------|----------|----------|----------|----------|
+
+## 快速导航
+
+### 按分析类型
+- **整体扫描**: (暂无)
+- **结构分析**: (暂无)
+- **流程分析**: (暂无)
+
+### 按分析范围
+- **root (.)**: (暂无)
+
+---
+*最后更新: {YYYY-MM-DD HH:MM}*
+```
+
+### 维护规则
+
+| 时机 | 操作 |
+|------|------|
+| 生成新文档 | 添加新行，更新快速导航和时间 |
+| 覆盖旧文档 | 更新对应行的时间和摘要 |
+| 删除文档 | 删除对应记录 |
+
+简要说明从文档第一章节提取摘要，限 50 字以内。
+
 ## 规范检查清单
 
-生成文档后，逐项检查：
-- `document-spec.md` — 文档结构与命名
-- `code-link-guide.md` — 代码链接格式
-- `scoring-guide.md` — 评分（如适用）
-- `manifest-guide.md` — manifest 记录完整性
+生成文档后，对照 `spec.md` 和本文档逐项检查：
+- 文档结构（头部/底部）
+- 代码链接格式
+- 评分（如适用）
+- Manifest 记录完整性

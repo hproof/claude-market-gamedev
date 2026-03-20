@@ -56,7 +56,19 @@ description: |
 
 ### 3. 计算文档名称
 
-按 `plugins/code-analyzer/docs/document-spec.md` 的命名规范标准化路径并拼接类型。
+按以下命名规则标准化路径并拼接类型：
+
+```
+{normalized-scope}-{type}.md
+```
+
+**路径标准化：** 移除前导 `./` 或 `/`，将 `/` 替换为 `-`，`.` 转换为 `root`。
+
+| 分析范围 | 分析类型 | 文档名 |
+|----------|----------|--------|
+| `.` | `full-scan` | `root-full-scan.md` |
+| `./src` | `structure` | `src-structure.md` |
+| `./src/render` | `flow` | `src-render-flow.md` |
 
 ### 4. 创建 Developer SubAgent 执行分析
 
@@ -69,7 +81,6 @@ description: |
 | `skill_name` | {skill_name} |
 | `doc_name` | {doc_name} |
 
-执行流程详见 `agents/developer.md`。
 
 ### 5. 返回结果给用户
 
