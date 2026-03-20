@@ -2,7 +2,7 @@
 
 ## 1. 设计目标
 
-提供一套游戏代码分析工作流，支持多种分析类型（整体扫描、结构分析、流程分析），通过 manifest 实现跨会话记忆，避免重复分析。
+提供一套游戏代码分析工作流，支持两种分析粒度（项目级整体扫描、模块级深度分析），通过 manifest 实现跨会话记忆，避免重复分析。
 
 ## 2. 架构模式
 
@@ -12,9 +12,8 @@
 graph TD
     User[用户输入] --> Entry["code-analyzer skill（入口）<br/>职责极简，只做转发"]
     Entry --> Agent["analyst agent（主控）<br/>需求理解 → 历史检查 → 调度分析 → 更新记忆"]
-    Agent --> FS[full-scan<br/>宏观概览]
-    Agent --> SA[structure-analyzer<br/>深度结构]
-    Agent --> FA[flow-analyzer<br/>流程追踪]
+    Agent --> FS[full-scan<br/>项目级宏观概览]
+    Agent --> MA[module-analyzer<br/>模块级深度分析<br/>结构 + 流程 + 依赖]
     Agent --> UM[update-manifest<br/>维护文档清单]
 ```
 
@@ -32,9 +31,9 @@ graph TD
 
 将需求理解、历史检查、路径决策、任务调度集中在一个 Agent 中，避免多 Agent 间的协调开销。Agent 不做具体分析，只做决策和编排。
 
-### 3.3 为什么每次只分析一个模块的一种类型？
+### 3.3 为什么按项目级/模块级划分而非按结构/流程划分？
 
-每次分析作为原子任务由 subagent 执行，天然控制上下文窗口大小，避免大项目分析时上下文溢出。用户可多次调用覆盖不同模块和类型。
+结构和流程是同一模块的两个视角，分开分析会割裂认知（看完结构不知道怎么跑，看完流程不知道类关系）。按粒度划分更自然：项目级做宏观概览，模块级做一次性的综合深入分析。每次分析作为原子任务由 subagent 执行，控制上下文窗口大小。
 
 ### 3.4 为什么分析 Skills 用 disable-model-invocation？
 

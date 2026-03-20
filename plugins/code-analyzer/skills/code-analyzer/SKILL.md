@@ -45,7 +45,8 @@ allowed-tools: Agent(analyst), Read
 ```
 /code-analyzer                                    # agent 自行判断范围和类型
 /code-analyzer ./src full-scan                    # 对 ./src 做整体扫描
-/code-analyzer 分析战斗模块的流程，重点关注初始化    # agent 解析自然语言
+/code-analyzer ./src/battle module                 # 对战斗模块做深度分析
+/code-analyzer 分析战斗模块，重点关注初始化          # agent 解析自然语言
 ```
 
 **询问模式：**
