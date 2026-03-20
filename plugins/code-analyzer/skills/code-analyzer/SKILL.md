@@ -1,13 +1,14 @@
 ---
 name: code-analyzer
 description: |
-  启动代码审计工作流。
-  当用户输入 /code-analyzer 或说"分析代码"、"审计项目"、"分析 XX 模块"、"分析 XX 流程"等时触发。
-  将用户的原始查询转交给 analyst agent 进行智能分析。
+  启动代码分析工作流。支持两种模式：
+  - 分析模式：当用户说"分析代码"、"审计项目"、"分析 XX 模块"等时触发，生成分析文档。
+  - 询问模式：当用户提问"XX流程是怎样的？"、"XX模块依赖了什么？"等时触发，基于已有分析回答。
+  将用户的原始查询转交给 analyst agent 进行智能处理。
 allowed-tools: Agent(analyst), Read
 ---
 
-启动代码审计工作流的入口 Skill。
+启动代码分析工作流的入口 Skill。
 
 ## 职责
 
@@ -17,7 +18,7 @@ allowed-tools: Agent(analyst), Read
 2. 启动 `analyst` agent，将原始查询完整传递
 3. 返回 agent 的执行结果给用户
 
-**不做**参数解析、文档命名、类型判断 — 这些全部由 `analyst` agent 负责。
+**不做**意图判断、参数解析、文档命名 — 这些全部由 `analyst` agent 负责。
 
 ## 工作流程
 
@@ -35,17 +36,22 @@ allowed-tools: Agent(analyst), Read
 
 ### 3. 返回结果
 
-将 agent 返回的分析结果原样呈现给用户，包括：
-- 分析完成状态
-- 输出文档路径
-- 简要摘要
-- 提示可查看 `./docs/code-analyzer/manifest.md` 了解所有文档
+将 agent 返回的结果原样呈现给用户。
 
 ## 使用示例
 
+**分析模式：**
+
 ```
 /code-analyzer                                    # agent 自行判断范围和类型
-/code-analyzer ./src                              # agent 识别范围为 ./src
-/code-analyzer ./src full-scan                    # agent 识别范围和类型
+/code-analyzer ./src full-scan                    # 对 ./src 做整体扫描
 /code-analyzer 分析战斗模块的流程，重点关注初始化    # agent 解析自然语言
+```
+
+**询问模式：**
+
+```
+/code-analyzer 战斗流程是怎么样的？                  # 基于已有分析文档回答
+/code-analyzer 渲染模块依赖了哪些底层模块？          # 查找 structure 文档回答
+/code-analyzer 项目有哪些业务模块？                  # 查找 full-scan 文档回答
 ```
