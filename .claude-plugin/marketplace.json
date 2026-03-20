@@ -12,7 +12,7 @@
     {
       "name": "code-analyzer",
       "source": "./plugins/code-analyzer",
-      "description": "游戏代码分析插件，提供多领域游戏技术专家（架构、UI框架、渲染管线、网络同步、场景管理、对象管理、物理引擎等）进行专业代码审查"
+      "description": "游戏代码分析插件，提供整体扫描（full-scan）、结构分析（structure）、流程分析（flow）三种分析能力"
     }
   ]
 }

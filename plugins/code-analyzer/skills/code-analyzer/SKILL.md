@@ -29,30 +29,11 @@ description: |
 
 ## 分析类型
 
-| 分析类型 | 说明 | 使用的 Skill | 输出文档 |
-|----------|------|-------------|----------|
-| `full-scan` | 整体扫描 | `full-scan` | `{scope}-full-scan.md` |
-| `structure` | 结构分析 | `structure-analyzer` | `{scope}-structure.md` |
-| `flow` | 流程分析 | `flow-analyzer` | `{scope}-flow.md` |
-
-**说明：**
-- `full-scan`：快速扫描项目整体结构，识别模块边界和层级关系
-- `structure`：分析代码结构、类关系、依赖关系
-- `flow`：分析关键流程（初始化、主循环、网络同步等）
-
-## 输出目录和文档规范
-
-### 固定输出目录
-
-所有分析文档保存到：`./docs/code-analyzer/`
-
-### 文档命名规则
-
-详见 `plugins/code-analyzer/docs/document-spec.md`
-
-### Manifest 文件
-
-详见 `plugins/code-analyzer/docs/manifest-guide.md`
+| 分析类型 | 说明 | 使用的 Skill |
+|----------|------|-------------|
+| `full-scan` | 宏观概览：快速扫描模块分布和层级关系，不深入依赖细节 | `full-scan` |
+| `structure` | 深度结构：详细分析类关系、依赖关系、耦合度 | `structure-analyzer` |
+| `flow` | 流程分析：追踪初始化、主循环、网络同步等关键流程 | `flow-analyzer` |
 
 ## 工作流程
 
@@ -68,18 +49,14 @@ description: |
 
 ```
 请选择分析类型：
-1. full-scan - 整体扫描：快速了解项目结构和模块分布
-2. structure - 结构分析：深入分析代码结构和依赖关系
-3. flow - 流程分析：分析关键执行流程（初始化、主循环等）
+1. full-scan - 宏观概览：快速了解项目模块分布和层级关系
+2. structure - 深度结构：详细分析类关系和模块依赖
+3. flow - 流程分析：追踪关键执行流程（初始化、主循环等）
 ```
 
 ### 3. 计算文档名称
 
-```python
-# 伪代码
-doc_name = normalize(scope) + "-" + type + ".md"
-# ./src + full-scan → src-full-scan.md
-```
+按 `plugins/code-analyzer/docs/document-spec.md` 的命名规范标准化路径并拼接类型。
 
 ### 4. 创建 Developer SubAgent 执行分析
 
@@ -91,7 +68,6 @@ doc_name = normalize(scope) + "-" + type + ".md"
 | `type` | {type} |
 | `skill_name` | {skill_name} |
 | `doc_name` | {doc_name} |
-| `manifest_path` | `./docs/code-analyzer/manifest.md` |
 
 执行流程详见 `agents/developer.md`。
 
@@ -101,31 +77,21 @@ doc_name = normalize(scope) + "-" + type + ".md"
 - 输出文档路径
 - 提示可查看 manifest.md 了解所有文档
 
+## 容错处理
+
+| 情况 | 处理方式 |
+|------|----------|
+| 目标路径不存在 | 提示用户路径无效，要求重新指定 |
+| 代码库过大（>5万行） | 建议用户缩小 scope 到子目录，分批分析 |
+| `.claudeignore` 不存在 | 正常执行，不忽略任何文件 |
+| manifest.md 不存在 | 自动创建初始模板 |
+
 ## 使用示例
 
 ```
 /code-analyzer                          # scope=., 询问 type
 /code-analyzer ./src                    # scope=./src, 询问 type
-/code-analyzer ./src full-scan          # 整体扫描
-/code-analyzer ./src structure          # 结构分析
+/code-analyzer ./src full-scan          # 宏观概览
+/code-analyzer ./src structure          # 深度结构分析
 /code-analyzer ./src flow               # 流程分析
-```
-
-## 输出示例
-
-执行 `/code-analyzer ./src full-scan` 后：
-
-```
-./docs/code-analyzer/
-├── manifest.md           # 文档清单
-└── src-full-scan.md      # 本次分析结果
-```
-
-执行 `/code-analyzer ./src structure` 后：
-
-```
-./docs/code-analyzer/
-├── manifest.md
-├── src-full-scan.md
-└── src-structure.md      # 新增
 ```

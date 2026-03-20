@@ -16,9 +16,9 @@
 | Skill | 描述 | 触发方式 |
 |-------|------|----------|
 | `code-analyzer` | 启动器，解析参数并调用 developer agent | `/code-analyzer [scope] [type]` |
-| `full-scan` | 整体扫描，识别模块边界 | `type=full-scan` |
-| `structure-analyzer` | 结构分析，分析代码结构和依赖 | `type=structure` |
-| `flow-analyzer` | 流程分析，分析关键执行流程 | `type=flow` |
+| `full-scan` | 宏观概览：扫描模块分布和层级关系 | `type=full-scan` |
+| `structure-analyzer` | 深度结构：分析类关系、文件依赖、耦合度 | `type=structure` |
+| `flow-analyzer` | 流程分析：追踪初始化、主循环、网络同步等关键流程 | `type=flow` |
 
 ## Agent 列表
 
@@ -40,9 +40,9 @@
 **分析类型关键词映射：**
 | 关键词 | 说明 | 调用的 Skill |
 |--------|------|-------------|
-| `full-scan`, `scan`, `整体扫描` | 快速扫描项目整体结构 | `full-scan` |
-| `structure`, `struct`, `结构分析` | 分析代码结构和依赖关系 | `structure-analyzer` |
-| `flow`, `流程分析` | 分析关键执行流程 | `flow-analyzer` |
+| `full-scan`, `scan`, `整体扫描` | 宏观概览：识别模块边界和层级 | `full-scan` |
+| `structure`, `struct`, `结构分析` | 深度结构：类关系、依赖、耦合度 | `structure-analyzer` |
+| `flow`, `流程分析` | 流程追踪：初始化、主循环、网络同步 | `flow-analyzer` |
 
 ## 文档清单机制
 

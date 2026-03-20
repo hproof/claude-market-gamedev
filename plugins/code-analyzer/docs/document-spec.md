@@ -49,7 +49,7 @@
 ```markdown
 # {文档标题}
 
-> [返回 Manifest](../manifest.md)
+> [返回 Manifest](./manifest.md)
 
 ## 导航
 
@@ -83,15 +83,6 @@
 3. 网络同步流程
 4. 关键业务流程
 5. 问题与建议
-
-**module（模块分析）：**
-1. 模块概述
-2. 内部结构
-3. 公开接口
-4. 核心类型
-5. 深度分析（如适用）
-6. 问题与建议
-7. 综合评分
 
 ### 底部模板
 
@@ -194,7 +185,7 @@
 
 ```markdown
 详细结构分析见 [src-structure.md](./src-structure.md)
-渲染模块分析见 [src-render-module.md](./src-render-module.md)
+渲染流程分析见 [src-render-flow.md](./src-render-flow.md)
 ```
 
 ### 引用 Manifest
@@ -202,5 +193,5 @@
 每个文档顶部必须包含返回 Manifest 的链接：
 
 ```markdown
-> [返回 Manifest](../manifest.md)
+> [返回 Manifest](./manifest.md)
 ```
