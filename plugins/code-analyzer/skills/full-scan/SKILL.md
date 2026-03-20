@@ -5,7 +5,7 @@ description: |
   明确各模块边界和层级关系，输出项目整体结构文档。
   当用户需要整体了解项目架构、识别模块边界时触发。
   适用于：项目整体架构评估、模块边界识别、初步代码审查。
-allowed-tools: Read, Write, Glob, Grep, Bash(find *), Bash(wc *)
+allowed-tools: Read, Write, Glob, Grep, Bash(*)
 disable-model-invocation: true
 ---
 
@@ -17,15 +17,19 @@ disable-model-invocation: true
 ## 工作流程
 
 1. **扫描项目结构**
-   - 遍历目录树（遵循 `.claudeignore` 忽略规则）
+   - 用 `Glob` 遍历目录树（遵循 `.claudeignore` 忽略规则）
    - 识别目录类型（第三方/底层/业务）
-   - 统计代码量和语言分布
+   - 用 `Bash(wc -l ...)` 统计代码量，用 `Glob` 统计语言分布
 
-2. **模块识别与分类**
+2. **加载领域知识**
+   - 读取 `${CLAUDE_PLUGIN_ROOT}/docs/game-glossary.md`，用于第三方库识别和模块功能分类
+
+3. **模块识别与分类**
 
    **第三方库识别**：
    - 扫描 `third_party/`、`external/`、`libs/`、`vendor/` 等目录
    - 识别开源许可证文件（LICENSE、COPYING）
+   - 参照 `game-glossary.md` 中间件列表，将 Wwise、FMOD、Spine 等识别为对应类别
 
    **底层模块识别**：
    - 被业务模块依赖但很少依赖业务模块
@@ -33,10 +37,11 @@ disable-model-invocation: true
    - 目录内语言一致、功能内聚
 
    **业务模块识别**：
+   - 参照 `game-glossary.md` 目录命名映射表，将目录名映射到功能分类
    - 场景内业务：战斗、探索等（与场景绑定）
    - 场景无关业务：背包、强化等（UI交互）
 
-3. **生成项目概览文档**
+4. **生成项目概览文档**
    - 输出到指定的 `output_file`
    - 包含模块分布图、层级关系图
    - 依赖关系仅展示**模块间的宏观依赖方向**（如"业务层 → 底层模块 → 第三方库"），不深入文件级依赖

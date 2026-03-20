@@ -4,7 +4,7 @@ description: |
   代码结构分析 Skill。负责分析代码的目录结构、类关系、模块依赖等。
   当用户选择"结构分析"类型时触发。
   适用于：代码组织评估、架构重构前分析、依赖关系梳理。
-allowed-tools: Read, Write, Glob, Grep, Bash(find *), Bash(wc *)
+allowed-tools: Read, Write, Glob, Grep, Bash(*)
 disable-model-invocation: true
 ---
 
@@ -15,22 +15,26 @@ disable-model-invocation: true
 
 ## 工作流程
 
-1. **目录结构分析**
-   - 扫描目录层级（遵循 `.claudeignore` 忽略规则）
-   - 识别代码文件分布
+1. **加载领域知识**
+   - 读取 `${CLAUDE_PLUGIN_ROOT}/docs/game-glossary.md`，辅助理解目录命名与模块功能的对应关系
+
+2. **目录结构分析**
+   - 用 `Glob` 扫描目录层级（遵循 `.claudeignore` 忽略规则）
+   - 用 `Glob` 识别代码文件分布
+   - 参照 `game-glossary.md` 命名映射表理解目录职责
    - 分析命名规范和目录组织
 
-2. **类/接口关系分析**
+3. **类/接口关系分析**
    - 识别主要类和接口
    - 分析继承关系
    - 分析组合/聚合关系
 
-3. **模块依赖分析**
-   - 分析文件间的 include/import 关系
+4. **模块依赖分析**
+   - 用 `Grep` 分析文件间的 include/import 关系
    - 识别循环依赖
    - 评估模块内聚性和耦合度
 
-4. **生成分析报告**
+5. **生成分析报告**
    - 输出到指定的 `output_file`
 
 ## 额外评分维度
