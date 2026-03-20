@@ -1,7 +1,7 @@
 {
   "name": "code-analyzer",
-  "description": "游戏代码分析插件，提供多领域游戏技术专家（架构、UI框架、渲染管线、网络同步、场景管理、对象管理、物理引擎等）进行专业代码分析",
-  "version": "1.0.0",
+  "description": "游戏代码分析插件，提供快速项目扫描和专项深度分析（渲染、网络、物理、UI等）",
+  "version": "2.0.0",
   "author": {
     "name": "hproof"
   }
