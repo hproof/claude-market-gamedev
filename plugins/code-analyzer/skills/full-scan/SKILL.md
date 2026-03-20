@@ -126,18 +126,16 @@ disable-model-invocation: true
 
 ## 3. 模块层级图
 
-```
-[业务层]
-  ├── 场景内业务（战斗、探索）
-  └── 场景无关业务（背包、强化）
+```mermaid
+graph TD
+    BIZ[业务层] --> BIZ_SCENE[场景内业务<br/>战斗、探索]
+    BIZ --> BIZ_UI[场景无关业务<br/>背包、强化]
 
-[底层模块]
-  ├── 渲染模块
-  ├── 网络模块
-  └── 资源管理
+    CORE[底层模块] --> Render[渲染模块]
+    CORE --> Network[网络模块]
+    CORE --> Resource[资源管理]
 
-[第三方库]
-  └── 所有外部依赖
+    LIB[第三方库] --> ExtDeps[所有外部依赖]
 ```
 
 [↑ 返回导航](#导航)
@@ -146,8 +144,9 @@ disable-model-invocation: true
 
 展示模块层级间的依赖方向（不深入文件级依赖，详细依赖分析见 structure 类型）：
 
-```
-[业务层] ──▶ [底层模块] ──▶ [第三方库]
+```mermaid
+graph LR
+    BIZ[业务层] --> CORE[底层模块] --> LIB[第三方库]
 ```
 
 [↑ 返回导航](#导航)

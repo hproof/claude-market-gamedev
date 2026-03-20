@@ -142,14 +142,48 @@
 
 ## 8. 图表规范
 
-使用 ASCII 艺术：
+使用 Mermaid 语法（GitHub / VS Code 原生渲染）。
 
-```
-[顶层]
-  ├── [子层1]
-  │     ├── [子子层1]
-  │     └── [子子层2]
-  └── [子层2]
-```
+**层级关系**用 `graph TD`（自顶向下）：
 
-依赖方向用箭头：`[模块A] ──▶ [模块B]`
+~~~markdown
+```mermaid
+graph TD
+    Top[顶层] --> Sub1[子层1]
+    Top --> Sub2[子层2]
+    Sub1 --> Sub1a[子子层1]
+    Sub1 --> Sub1b[子子层2]
+```
+~~~
+
+**依赖方向**用 `graph LR`（从左到右）：
+
+~~~markdown
+```mermaid
+graph LR
+    A[模块A] --> B[模块B] --> C[模块C]
+```
+~~~
+
+**类关系**用 `classDiagram`：
+
+~~~markdown
+```mermaid
+classDiagram
+    BaseClass <|-- DerivedClass1
+    BaseClass <|-- DerivedClass2
+    ClassA *-- ClassB : contains
+    ClassC ..> ClassD : uses
+```
+~~~
+
+**流程**用 `graph TD`：
+
+~~~markdown
+```mermaid
+graph TD
+    Start[开始] --> Step1[步骤1]
+    Step1 --> Step2[步骤2]
+    Step2 --> End[结束]
+```
+~~~

@@ -3,8 +3,8 @@ name: code-analyzer
 description: |
   启动代码审计工作流。
   当用户输入 /code-analyzer 或说"分析代码"、"审计项目"、"分析 XX 模块"、"分析 XX 流程"等时触发。
-  将用户的原始查询转交给 developer agent 进行智能分析。
-allowed-tools: Agent(developer), Read
+  将用户的原始查询转交给 analyst agent 进行智能分析。
+allowed-tools: Agent(analyst), Read
 ---
 
 启动代码审计工作流的入口 Skill。
@@ -14,10 +14,10 @@ allowed-tools: Agent(developer), Read
 本 Skill 仅作为入口层，职责极简：
 
 1. 接收用户的原始输入
-2. 启动 `developer` agent，将原始查询完整传递
+2. 启动 `analyst` agent，将原始查询完整传递
 3. 返回 agent 的执行结果给用户
 
-**不做**参数解析、文档命名、类型判断 — 这些全部由 `developer` agent 负责。
+**不做**参数解析、文档命名、类型判断 — 这些全部由 `analyst` agent 负责。
 
 ## 工作流程
 
@@ -25,9 +25,9 @@ allowed-tools: Agent(developer), Read
 
 原样保留用户的完整查询文本，不做任何解析。
 
-### 2. 启动 Developer Agent
+### 2. 启动 Analyst Agent
 
-调用 `developer` agent，传递：
+调用 `analyst` agent，传递：
 
 | 参数 | 值 |
 |------|-----|

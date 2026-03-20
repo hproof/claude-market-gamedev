@@ -85,17 +85,18 @@ disable-model-invocation: true
 
 ### 2.2 继承关系
 
-```
-[BaseClass]
-    ├── [DerivedClass1]
-    └── [DerivedClass2]
+```mermaid
+classDiagram
+    BaseClass <|-- DerivedClass1
+    BaseClass <|-- DerivedClass2
 ```
 
 ### 2.3 组合/聚合关系
 
-```
-[ClassA] ──contains──▶ [ClassB]
-[ClassC] ──uses─────▶ [ClassD]
+```mermaid
+classDiagram
+    ClassA *-- ClassB : contains
+    ClassC ..> ClassD : uses
 ```
 
 [↑ 返回导航](#导航)
@@ -110,8 +111,9 @@ disable-model-invocation: true
 
 ### 3.2 关键依赖路径
 
-```
-[模块A] → [模块B] → [模块C]
+```mermaid
+graph LR
+    A[模块A] --> B[模块B] --> C[模块C]
 ```
 
 ### 3.3 问题依赖

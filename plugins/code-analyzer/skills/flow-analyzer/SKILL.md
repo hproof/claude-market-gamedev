@@ -72,13 +72,13 @@ disable-model-invocation: true
 
 ### 1.2 初始化调用链
 
-```
-[Entry]
-    ├── [ConfigInit]      配置加载
-    ├── [LogInit]         日志初始化
-    ├── [RenderInit]      渲染初始化
-    ├── [NetworkInit]     网络初始化
-    └── [GameInit]        游戏逻辑初始化
+```mermaid
+graph TD
+    Entry[Entry] --> ConfigInit[ConfigInit 配置加载]
+    Entry --> LogInit[LogInit 日志初始化]
+    Entry --> RenderInit[RenderInit 渲染初始化]
+    Entry --> NetworkInit[NetworkInit 网络初始化]
+    Entry --> GameInit[GameInit 游戏逻辑初始化]
 ```
 
 ### 1.3 模块加载顺序
@@ -101,14 +101,14 @@ disable-model-invocation: true
 
 ### 2.2 每帧执行流程
 
-```
-[Frame Start]
-    ├── [Input Update]      输入处理
-    ├── [Network Update]    网络更新
-    ├── [Logic Update]      逻辑更新
-    ├── [Physics Update]    物理更新
-    ├── [Render Update]     渲染更新
-    └── [Frame End]         帧结束处理
+```mermaid
+graph TD
+    FrameStart[Frame Start] --> Input[Input Update 输入处理]
+    Input --> Network[Network Update 网络更新]
+    Network --> Logic[Logic Update 逻辑更新]
+    Logic --> Physics[Physics Update 物理更新]
+    Physics --> Render[Render Update 渲染更新]
+    Render --> FrameEnd[Frame End 帧结束处理]
 ```
 
 ### 2.3 更新顺序
@@ -127,22 +127,22 @@ disable-model-invocation: true
 
 ### 3.1 发包流程
 
-```
-[业务逻辑]
-    ├── [PackData]          序列化数据
-    ├── [AddHeader]         添加协议头
-    ├── [Encrypt]           加密（如有）
-    └── [Send]              发送
+```mermaid
+graph TD
+    Biz[业务逻辑] --> Pack[PackData 序列化数据]
+    Pack --> Header[AddHeader 添加协议头]
+    Header --> Encrypt[Encrypt 加密]
+    Encrypt --> Send[Send 发送]
 ```
 
 ### 3.2 收包流程
 
-```
-[Network Recv]
-    ├── [Decrypt]           解密（如有）
-    ├── [ParseHeader]       解析协议头
-    ├── [Dispatch]          分发到处理器
-    └── [Business Handle]   业务处理
+```mermaid
+graph TD
+    Recv[Network Recv] --> Decrypt[Decrypt 解密]
+    Decrypt --> Parse[ParseHeader 解析协议头]
+    Parse --> Dispatch[Dispatch 分发到处理器]
+    Dispatch --> Handle[Business Handle 业务处理]
 ```
 
 ### 3.3 状态同步机制
@@ -159,11 +159,11 @@ disable-model-invocation: true
 
 ### 4.1 典型业务流程
 
-```
-[流程名称]
-    ├── [步骤1]
-    ├── [步骤2]
-    └── [步骤3]
+```mermaid
+graph TD
+    Start[流程名称] --> S1[步骤1]
+    S1 --> S2[步骤2]
+    S2 --> S3[步骤3]
 ```
 
 ### 4.2 业务流程列表

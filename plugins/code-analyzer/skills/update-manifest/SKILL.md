@@ -2,7 +2,7 @@
 name: update-manifest
 description: |
   维护 Code Analyzer 的文档清单（manifest.md）。
-  在分析任务完成后由 developer agent 调用，负责新增/更新/删除文档记录。
+  在分析任务完成后由 analyst agent 调用，负责新增/更新/删除文档记录。
   不应由用户直接触发。
 allowed-tools: Read, Write, Glob
 disable-model-invocation: true
