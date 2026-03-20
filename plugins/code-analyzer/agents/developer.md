@@ -24,7 +24,8 @@ tools: Read, Write, Edit, Glob, Grep, Bash(find *), Bash(wc *), Bash(ls *), Skil
 
 **立即**读取 `./docs/code-analyzer/manifest.md`：
 - 如存在：解析文档列表，了解历史分析记录，用于后续决策
-- 如不存在：记住需要在分析完成后初始化
+- 如不存在但 `./docs/code-analyzer/` 目录下有 `.md` 文件：调用 `update-manifest` 的 `rebuild` 操作重建清单
+- 如不存在且无历史文档：记住需要在分析完成后初始化
 
 ### 第 2 步：阅读规范文档
 
@@ -132,6 +133,7 @@ Skill: update-manifest
 | 目标路径不存在 | 提示用户路径无效，要求重新指定 |
 | 代码库过大（>5万行） | 建议用户缩小 scope 到子目录，分批分析 |
 | manifest.md 不存在 | 正常执行，`update-manifest` 会自动创建 |
+| manifest 与实际文档不一致 | 调用 `update-manifest` 的 `rebuild` 操作重建清单 |
 
 ## 规范检查清单
 
