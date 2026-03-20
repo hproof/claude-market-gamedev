@@ -138,6 +138,7 @@ disable-model-invocation: true
 ## 3. 模块层级图
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e1f5fe' }, 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph TD
     BIZ[业务层] --> BIZ_SCENE[场景内业务<br/>战斗、探索]
     BIZ --> BIZ_UI[场景无关业务<br/>背包、强化]
@@ -147,6 +148,17 @@ graph TD
     CORE --> Resource[资源管理]
 
     LIB[第三方库] --> ExtDeps[所有外部依赖]
+
+    %% 增加节点间距优化高度显示
+    subgraph 业务层[""]
+        BIZ
+    end
+    subgraph 底层[""]
+        CORE
+    end
+    subgraph 第三方[""]
+        LIB
+    end
 ```
 
 [↑ 返回导航](#导航)
@@ -156,6 +168,7 @@ graph TD
 展示模块层级间的依赖方向（不深入文件级依赖，详细依赖分析见 module 类型）：
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 20 }}}%%
 graph LR
     BIZ[业务层] --> CORE[底层模块] --> LIB[第三方库]
 ```
@@ -175,11 +188,21 @@ graph LR
 ### 5.2 主循环框架
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 20 }}}%%
 graph TD
     FrameStart[帧开始] --> Phase1[阶段1]
     Phase1 --> Phase2[阶段2]
     Phase2 --> PhaseN[阶段N]
     PhaseN --> FrameEnd[帧结束]
+
+    %% 增加垂直间距优化显示
+    subgraph 单帧流程[""]
+        FrameStart
+        Phase1
+        Phase2
+        PhaseN
+        FrameEnd
+    end
 ```
 
 [↑ 返回导航](#导航)

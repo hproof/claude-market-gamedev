@@ -119,6 +119,7 @@ disable-model-invocation: true
 ### 2.2 子模块层级图
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 16, 'nodeSpacing': 50, 'rankSpacing': 60 }}}%%
 graph TD
     Root[模块名] --> Sub1[子模块1<br/>职责]
     Root --> Sub2[子模块2<br/>职责]
@@ -139,6 +140,7 @@ graph TD
 ### 3.2 继承关系
 
 ```mermaid
+%%{init: {'theme': 'base', 'class': { 'useMaxWidth': true, 'padding': 16 }}}%%
 classDiagram
     BaseClass <|-- DerivedClass1
     BaseClass <|-- DerivedClass2
@@ -160,6 +162,7 @@ classDiagram
 ### 4.1 子模块依赖图
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 16, 'nodeSpacing': 40, 'rankSpacing': 60 }}}%%
 graph LR
     Sub1[子模块1] --> Sub2[子模块2]
     Sub1 --> Sub3[子模块3]
@@ -186,6 +189,7 @@ graph LR
 ### 5.1 外部关系图
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 20, 'nodeSpacing': 40, 'rankSpacing': 60 }}}%%
 graph LR
     ExtA[外部模块A] --> ThisMod[当前模块]
     ExtB[外部模块B] --> ThisMod
@@ -222,6 +226,7 @@ graph LR
 #### 流程 1：{流程名称}
 
 ```mermaid
+%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 16, 'nodeSpacing': 50, 'rankSpacing': 60 }}}%%
 graph TD
     Entry[入口] --> Step1[步骤1]
     Step1 --> Step2[步骤2]
