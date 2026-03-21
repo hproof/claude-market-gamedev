@@ -20,10 +20,13 @@ def get_cwd():
 
 
 def encode_path(cwd):
-    """将当前工作目录编码为日志目录名"""
+    """将当前工作目录编码为日志目录名
+
+    编码规则：
+    - 盘符 : 替换为 --
+    - 路径分隔符 \ 或 / 替换为 -
+    """
     encoded = cwd.replace(':', '--').replace('\\', '-').replace('/', '-')
-    while '--' in encoded:
-        encoded = encoded.replace('--', '-')
     return encoded
 
 
