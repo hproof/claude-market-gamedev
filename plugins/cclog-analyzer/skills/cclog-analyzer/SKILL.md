@@ -14,23 +14,18 @@ allowed-tools: Read, Glob, Bash(python *), AskUserQuestion
 
 ## 执行步骤（严格按顺序执行）
 
-### 步骤 1：获取当前项目目录名
+### 步骤 1：获取当前工作目录
 
-根据当前工作目录（cwd），按编码规则转换：
-- 盘符 `:` → `--`
-- 路径分隔符 `\` 或 `/` → `-`
-
-**示例：** `D:\git_proj\bullet3` → `D--git-proj-bullet3`
-
-日志目录路径：`~/.claude/projects/{encoded-path}/`
+从环境获取当前工作目录（cwd），例如：`D:\git_proj\bullet3`
 
 ### 步骤 2：调用脚本获取用户提问列表
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py ~/.claude/projects/{encoded-path}
+python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py "{cwd}"
 ```
 
 **脚本功能：**
+- 根据当前目录自动定位日志目录（编码转换）
 - 自动找到最新的 `.jsonl` 会话日志文件
 - 提取其中所有 `type: "user"` 的记录
 
@@ -59,17 +54,15 @@ session-file.jsonl|line-num|uuid|timestamp|content-preview
 ### 步骤 4：深度遍历提取完整执行树
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py \
-  ~/.claude/projects/{encoded-path} \
-  {session-file} \
-  {selected-uuid}
+python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py "{cwd}" {session-file} {selected-uuid}
 ```
 
 **脚本功能（深度优先遍历）：**
-1. 从目标提问开始顺序遍历主会话日志
-2. 遇到子代理调用时，**立即**读取并输出子代理日志
-3. 子代理日志输出完成后，**返回**主会话继续遍历
-4. 保持完整的执行时序
+1. 根据当前目录自动定位日志目录
+2. 从目标提问开始顺序遍历主会话日志
+3. 遇到子代理调用时，**立即**读取并输出子代理日志
+4. 子代理日志输出完成后，**返回**主会话继续遍历
+5. 保持完整的执行时序
 
 **脚本输出格式：**
 ```
@@ -145,19 +138,7 @@ SOURCE|{完整的 JSON 行}
 ```
 **解析**: 收到子代理返回结果
 
-### 记录 9 [MAIN]
-```json
-{主会话的下一个 tool_use}
-```
-**解析**: 主会话继续执行下一个工具
-
 ...（继续深度遍历）
-
-### 记录 N [MAIN]
-```json
-{最终的 assistant 回复}
-```
-**解析**: Claude 向用户返回最终结果
 
 ---
 
@@ -170,17 +151,6 @@ SOURCE|{完整的 JSON 行}
 | 各子代理记录数 | agent-xxx: X, agent-yyy: Y |
 | 总执行时间 | 首条到最后一条的时间差 |
 ```
-
-## 日志格式参考
-
-详细规范请参阅：`${CLAUDE_PLUGIN_ROOT}/docs/log-format-spec.md`
-
-关键字段：
-- `type`: user/assistant/progress
-- `uuid`: 唯一标识
-- `parentUuid`: 父节点
-- `timestamp`: 时间戳
-- `data.agentId`: 子代理标识
 
 ## 重要原则
 
