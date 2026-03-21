@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 find_and_list_prompts.py
-自动获取当前工作目录，找到日志并列出所有用户提问
+列出指定会话日志中的所有用户提问
 
-用法: python find_and_list_prompts.py
-输出: 每行一个用户提问，格式: session-file|timestamp|content-preview|uuid
+用法: python find_and_list_prompts.py <session-id>
+输出: 每行一个用户提问，格式: timestamp|content-preview|uuid
 """
 
 import json
@@ -15,15 +15,13 @@ from pathlib import Path
 
 def get_cwd():
     """获取当前工作目录"""
-    # 优先从环境变量获取，否则使用进程当前目录
     return os.environ.get('PWD', os.getcwd())
 
 
 def encode_path(cwd):
     """将当前工作目录编码为日志目录名"""
     import re
-    # 将 [: \\ / _] 替换为 -
-    encoded = re.sub(r'[:\\\\/_]', '-', cwd)
+    encoded = re.sub(r'[:\\/_]', '-', cwd)
     return encoded
 
 
@@ -35,40 +33,21 @@ def get_log_dir(cwd):
     return log_dir
 
 
-def find_latest_session_log(project_dir):
-    """找到最新的 .jsonl 会话日志文件"""
-    project_path = Path(project_dir)
-    if not project_path.exists():
-        return None
-
-    jsonl_files = list(project_path.glob("*.jsonl"))
-    if not jsonl_files:
-        return None
-
-    latest = max(jsonl_files, key=lambda f: f.stat().st_mtime)
-    return latest
-
-
 def is_real_user_input(record):
     """判断是否是真正的用户输入（排除系统消息和工具结果）"""
     message = record.get('message', {})
     content = message.get('content', '') if isinstance(message, dict) else ''
 
-    # content 是数组的情况：检查是否包含 tool_result
     if isinstance(content, list):
-        # 如果数组中包含 tool_result 类型，则不是真实用户输入
         for item in content:
             if isinstance(item, dict) and item.get('type') in ('tool_result', 'tool_use'):
                 return False
-        # 将数组转为字符串用于预览
         return True
 
-    # content 是字符串的情况
     if not isinstance(content, str):
         return False
 
     content = content.strip()
-    # 排除系统标签包裹的内容
     if content.startswith('<local-command-caveat>'):
         return False
     if content.startswith('<command-name>'):
@@ -86,7 +65,6 @@ def get_content_preview(record):
     content = message.get('content', '') if isinstance(message, dict) else ''
 
     if isinstance(content, list):
-        # 提取数组中的文本内容
         texts = []
         for item in content:
             if isinstance(item, dict):
@@ -112,7 +90,6 @@ def extract_user_prompts(log_file):
             try:
                 record = json.loads(line)
                 if record.get('type') == 'user':
-                    # 过滤非真实用户输入
                     if not is_real_user_input(record):
                         continue
 
@@ -134,6 +111,13 @@ def extract_user_prompts(log_file):
 
 
 def main():
+    if len(sys.argv) < 2:
+        print(f"用法: python {sys.argv[0]} <session-id>", file=sys.stderr)
+        print(f"示例: python {sys.argv[0]} xxx-xxx-xxxx-xxxx", file=sys.stderr)
+        sys.exit(1)
+
+    session_id = sys.argv[1]
+
     # 1. 获取当前工作目录
     cwd = get_cwd()
 
@@ -143,19 +127,18 @@ def main():
         print(f"错误: 日志目录不存在: {log_dir}", file=sys.stderr)
         sys.exit(1)
 
-    # 3. 找到最新的会话日志
-    latest_log = find_latest_session_log(log_dir)
-    if not latest_log:
-        print(f"错误: 在 {log_dir} 中找不到会话日志文件", file=sys.stderr)
+    # 3. 构建会话日志文件路径
+    log_file = log_dir / f"{session_id}.jsonl"
+    if not log_file.exists():
+        print(f"错误: 会话文件不存在: {log_file}", file=sys.stderr)
         sys.exit(1)
 
     # 4. 提取所有用户提问
-    prompts = extract_user_prompts(latest_log)
+    prompts = extract_user_prompts(log_file)
 
-    # 5. 输出格式: session-file|timestamp|content-preview|uuid
-    session_name = latest_log.name
+    # 5. 输出格式: timestamp|content-preview|uuid
     for prompt in prompts:
-        print(f"{session_name}|{prompt['timestamp']}|{prompt['preview']}|{prompt['uuid']}")
+        print(f"{prompt['timestamp']}|{prompt['preview']}|{prompt['uuid']}")
 
 
 if __name__ == '__main__':
