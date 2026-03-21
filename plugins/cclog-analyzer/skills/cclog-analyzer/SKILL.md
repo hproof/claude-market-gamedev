@@ -8,35 +8,22 @@ allowed-tools: Read, Glob, Bash(python *), AskUserQuestion
 
 # Claude Code 执行日志分析器
 
-## 核心任务
+## 执行步骤
 
-帮助用户追溯某次提问的完整执行过程，展示 Claude 如何思考、调用工具和协调子代理。
-
-## 执行步骤（严格按顺序执行）
-
-### 步骤 1：获取当前工作目录
-
-从环境获取当前工作目录（cwd），例如：`D:\git_proj\bullet3`
-
-### 步骤 2：调用脚本获取用户提问列表
+### 步骤 1：获取用户提问列表
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py "{cwd}"
+python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py
 ```
 
-**脚本功能：**
-- 根据当前目录自动定位日志目录（编码转换）
-- 自动找到最新的 `.jsonl` 会话日志文件
-- 提取其中所有 `type: "user"` 的记录
-
-**脚本输出格式：**
+**输出格式：**
 ```
 session-file.jsonl|line-num|uuid|timestamp|content-preview
 ```
 
-### 步骤 3（⚠️ 关键）：强制用户选择提问
+### 步骤 2（⚠️ 关键）：强制用户选择
 
-解析步骤2的输出，使用 `AskUserQuestion` 展示列表：
+使用 `AskUserQuestion` 展示列表，必须等待用户明确选择：
 
 ```
 请选择要分析的执行记录：
@@ -46,36 +33,25 @@ session-file.jsonl|line-num|uuid|timestamp|content-preview
 3. [2026-03-14 14:00:45] 帮我找出碰撞检测相关的核心文件...
 ```
 
-**要求：**
-- 必须等待用户明确选择后才能继续
-- 不允许自动选择
-- 获取用户选择项的 `uuid` 和 `session-file`
+**获取：** `session-file` 和 `uuid`
 
-### 步骤 4：深度遍历提取完整执行树
+### 步骤 3：深度遍历提取执行树
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py "{cwd}" {session-file} {selected-uuid}
+python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py {session-file} {uuid}
 ```
 
-**脚本功能（深度优先遍历）：**
-1. 根据当前目录自动定位日志目录
-2. 从目标提问开始顺序遍历主会话日志
-3. 遇到子代理调用时，**立即**读取并输出子代理日志
-4. 子代理日志输出完成后，**返回**主会话继续遍历
-5. 保持完整的执行时序
-
-**脚本输出格式：**
+**输出格式：**
 ```
 SOURCE|{完整的 JSON 行}
 ```
 
-其中 SOURCE 为：
 - `MAIN` - 主会话记录
 - `agent-{id}` - 子代理记录
 
-### 步骤 5：深度遍历输出分析报告
+### 步骤 4：深度遍历输出分析报告
 
-按步骤4的输出顺序，逐行解析并生成报告。**一条日志对应一个分析条目。**
+逐行解析步骤3的输出，**一条日志对应一个分析条目**。
 
 **输出格式：**
 
@@ -84,7 +60,7 @@ SOURCE|{完整的 JSON 行}
 
 ## 用户提问
 **会话**: {session-file}
-**UUID**: {selected-uuid}
+**UUID**: {uuid}
 
 ---
 
@@ -116,27 +92,21 @@ SOURCE|{完整的 JSON 行}
 
 ### 记录 5 [agent-xxx]
 ```json
-{子代理的第 2 条记录 (tool_use Bash)}
+{子代理的第 2 条记录}
 ```
-**解析**: 子代理执行 Bash 命令
+**解析**: 子代理执行工具
 
 ### 记录 6 [agent-xxx]
 ```json
-{子代理的第 3 条记录 (tool_result)}
+{子代理的第 3 条记录}
 ```
-**解析**: Bash 命令返回结果
+**解析**: 子代理收到结果
 
-### 记录 7 [agent-xxx]
+### 记录 7 [MAIN]
 ```json
-{子代理的最后一条记录}
+{主会话收到子代理结果}
 ```
-**解析**: 子代理完成，返回结果
-
-### 记录 8 [MAIN]
-```json
-{主会话的 tool_result JSON}
-```
-**解析**: 收到子代理返回结果
+**解析**: 收到子代理返回结果，继续执行
 
 ...（继续深度遍历）
 
@@ -148,7 +118,7 @@ SOURCE|{完整的 JSON 行}
 | 总记录数 | X |
 | 主会话记录数 | X |
 | 子代理数量 | X |
-| 各子代理记录数 | agent-xxx: X, agent-yyy: Y |
+| 各子代理记录数 | agent-xxx: X |
 | 总执行时间 | 首条到最后一条的时间差 |
 ```
 

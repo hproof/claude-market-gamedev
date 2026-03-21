@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 """
 extract_deep_execution.py
-根据当前工作目录，自动找到日志目录并深度遍历提取执行树
+自动获取当前工作目录，深度遍历提取指定提问的执行树
 
-用法: python extract_deep_execution.py <current-working-dir> <session-file> <prompt-uuid>
+用法: python extract_deep_execution.py <session-file> <prompt-uuid>
 输出: 深度遍历的所有记录，格式: [SOURCE]|{json-line}
       SOURCE: MAIN 或 agent-{id}
 """
 
 import json
+import os
 import sys
 from pathlib import Path
+
+
+def get_cwd():
+    """获取当前工作目录"""
+    return os.environ.get('PWD', os.getcwd())
 
 
 def encode_path(cwd):
@@ -76,7 +82,7 @@ def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=No
         uuid = record.get('uuid', '')
         parent_uuid = record.get('parentUuid', '')
 
-        # 检查是否相关：uuid 已在集合中，或 parentUuid 在集合中，或是起始行
+        # 检查是否相关
         is_related = (uuid in related_uuids) or (parent_uuid in related_uuids) or (i == start_idx)
 
         if not is_related:
@@ -87,13 +93,12 @@ def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=No
         print(f"MAIN|{raw_line}")
         related_uuids.add(uuid)
 
-        # 检查是否是子代理调用（progress 类型且有 agentId）
+        # 检查是否是子代理调用
         agent_id = extract_agent_id_from_progress(record)
         if agent_id:
             # 深度优先：立即读取并输出子代理日志
             subagent_log = log_dir / session_name / 'subagents' / f'agent-{agent_id}.jsonl'
             if subagent_log.exists():
-                # 输出子代理所有记录
                 with open(subagent_log, 'r', encoding='utf-8') as f:
                     for sub_line in f:
                         sub_line = sub_line.rstrip('\n\r')
@@ -104,17 +109,18 @@ def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=No
 
 
 def main():
-    if len(sys.argv) < 4:
-        print(f"用法: python {sys.argv[0]} <current-working-dir> <session-file> <prompt-uuid>", file=sys.stderr)
-        print(f"示例: python {sys.argv[0]} 'D:\\git_proj\\bullet3' session.jsonl uuid", file=sys.stderr)
+    if len(sys.argv) < 3:
+        print(f"用法: python {sys.argv[0]} <session-file> <prompt-uuid>", file=sys.stderr)
+        print(f"示例: python {sys.argv[0]} session.jsonl uuid", file=sys.stderr)
         sys.exit(1)
 
-    cwd = sys.argv[1]
-    session_file = sys.argv[2]
-    target_uuid = sys.argv[3]
+    session_file = sys.argv[1]
+    target_uuid = sys.argv[2]
 
-    # 1. 根据当前目录找到日志目录
+    # 1. 获取当前工作目录并找到日志目录
+    cwd = get_cwd()
     log_dir = get_log_dir(cwd)
+
     if not log_dir.exists():
         print(f"错误: 日志目录不存在: {log_dir}", file=sys.stderr)
         sys.exit(1)
