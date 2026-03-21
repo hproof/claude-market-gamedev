@@ -3,7 +3,7 @@ name: cclog-analyzer
 description: |
   分析当前 Claude Code 会话的执行日志，追溯用户提问的完整执行流程。
   在用户询问"分析这次执行"、"查看刚才的执行过程"、"这次 Claude 是怎么处理的"时触发。
-allowed-tools: Read, Glob, Grep, Bash(find *), Bash(wc *), Bash(head *), Bash(tail *), Bash(jq *), AskUserQuestion
+allowed-tools: Read, Glob, Grep, Bash(*), AskUserQuestion
 ---
 
 # Claude Code 执行日志分析器
@@ -34,14 +34,26 @@ allowed-tools: Read, Glob, Grep, Bash(find *), Bash(wc *), Bash(head *), Bash(ta
 - `timestamp`：提问时间
 - `message.content`：提问内容（取前 100 字摘要）
 
+**推荐使用脚本（性能更好）：**
 ```bash
-# 使用 jq 提取用户提问
+python ${CLAUDE_PLUGIN_ROOT}/scripts/list_user_prompts.py {session-id}.jsonl
+```
+
+或手动使用 jq：
+```bash
 cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|\(.message.content[0:100])"'
 ```
 
-### 阶段 2：让用户选择要分析的提问
+### 阶段 2：强制用户选择要分析的提问
 
-使用 `AskUserQuestion` 工具展示用户提问列表，让用户选择。
+**重要：必须等待用户选择后才能继续！**
+
+使用 `AskUserQuestion` 工具展示用户提问列表。如果用户没有明确指定要分析哪个提问，必须弹出选择列表让用户选择，绝不能自动选择。
+
+**强制选择要求：**
+- 如果用户空参数调用此 skill，必须使用 AskUserQuestion 弹出选择框
+- 必须等待用户做出明确选择后才能进入阶段 3
+- 不允许基于任何启发式规则自动选择（如选择最新的、选择最长的等）
 
 **选择列表格式：**
 ```
@@ -54,16 +66,30 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 ```
 
 **获取选择结果：**
-- 记录用户选择的索引
-- 获取该提问的 `uuid` 作为分析的根节点
+- 使用 AskUserQuestion 获取用户明确选择的索引
+- 只有用户确认选择后，才能获取该提问的 `uuid` 进入下一阶段
+- **禁止**：在没有用户选择的情况下自动进入阶段 3
 
 ### 阶段 3：构建执行树并分析
 
-**3.1 读取主会话日志中与该提问相关的所有记录**
+**3.1 提取完整执行树**
+
+**推荐使用脚本（性能更好）：**
+```bash
+python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_execution_tree.py {session-id}.jsonl {prompt-uuid}
+```
+
+该脚本会：
+- 找到目标提问及其所有后代节点
+- 按时间戳排序输出所有相关记录
+- 自动加载并附加子代理日志
+
+**手动实现方式（如不使用脚本）：**
 
 从用户提问的 `uuid` 开始，追踪所有后代节点：
 - 使用 `parentUuid` 关联查找
 - 收集所有相关的 `assistant`、`progress`、`tool_result` 记录
+- 递归查找子节点的子节点（最多 100 层）
 
 **3.2 识别子代理调用**
 
@@ -75,9 +101,8 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 **3.3 读取子代理日志**
 
 对于每个子代理：
-```bash
-# 子代理日志路径
-{session-id}/subagents/agent-{agentId}.jsonl
+```
+子代理日志路径: {session-id}/subagents/agent-{agentId}.jsonl
 ```
 
 提取子代理的执行记录，结构与主会话相同。
@@ -102,6 +127,15 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 ```
 
 ### 阶段 4：输出执行过程报告
+
+**输出原则：**
+1. **每条日志记录对应一个独立步骤** - 不要将多条日志合并为一步输出
+2. **所有传递的 prompt/content 完整输出** - 包括：
+   - 调用 Agent 时的 `prompt` 参数
+   - 调用 Skill 时的完整输入
+   - 传递给子代理的所有 `content`
+   - 不要摘要，保留完整原始内容
+3. **按时间顺序严格输出** - 保持日志的时间先后顺序
 
 以清晰的层级结构输出执行过程：
 
@@ -133,6 +167,19 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 
 #### ↳ 子代理执行 (agentId: af0c9fe6a1e515033, 类型: Explore)
 
+**子代理任务描述**（完整内容）：
+```
+请探索 Bullet3 物理引擎的 src/LinearMath 目录，了解其代码结构和主要功能。这个模块是数学工具库，包含向量、矩阵等基础数学类。
+
+请分析：
+1. 目录结构和主要头文件/源文件
+2. 核心类及其职责（如 btVector3, btMatrix3x3, btTransform 等）
+3. 关键数学工具和数据结构
+4. 文件间的依赖关系
+
+请提供结构化的总结。
+```
+
 **Step 2.1**: 工具调用 - Bash (Bash_0)
 - 命令: `ls -la D:/git_proj/bullet3/src/LinearMath`
 - 结果: [成功] 列出 50+ 个文件
@@ -145,7 +192,15 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 - 命令: `find ... -type d | head -50`
 - 结果: [成功]
 
-**子代理完成**: 返回结构化总结
+**Step 2.4**: 工具调用 - Read (Read_0)
+- 文件: `src/LinearMath/btVector3.h`
+- 结果: [成功] 读取文件内容
+
+**Step 2.5**: 工具调用 - Read (Read_1)
+- 文件: `src/LinearMath/btMatrix3x3.h`
+- 结果: [成功] 读取文件内容
+
+**子代理完成**: 返回结构化总结（完整内容输出）
 
 ---
 
@@ -158,6 +213,19 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 
 #### ↳ 子代理执行 (agentId: a00463737d01a6eee, 类型: Explore)
 
+**子代理任务描述**（完整内容）：
+```
+请探索 Bullet3 物理引擎的 src/BulletCollision 目录，了解其碰撞检测系统的代码结构。
+
+请分析：
+1. 目录结构（BroadphaseCollision, NarrowPhaseCollision, CollisionShapes, CollisionDispatch 等子目录）
+2. 核心类及其职责
+3. 碰撞检测的主要流程
+4. 各种碰撞形状（box, sphere, mesh 等）的组织方式
+
+请提供结构化的总结。
+```
+
 **Step 3.1**: 工具调用 - Bash (Bash_0)
 - 命令: `find /d/git_proj/bullet3/src/BulletCollision -type d | head -50`
 - 结果: [成功]
@@ -166,7 +234,11 @@ cat {session-id}.jsonl | jq -r 'select(.type=="user") | "\(.uuid)|\(.timestamp)|
 - 模式: `src/BulletCollision/**/*.h`
 - 结果: 匹配到 80+ 个头文件
 
-**子代理完成**: 返回结构化总结
+**Step 3.3**: 工具调用 - Read (Read_0)
+- 文件: `src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h`
+- 结果: [成功]
+
+**子代理完成**: 返回结构化总结（完整内容输出）
 
 ---
 
