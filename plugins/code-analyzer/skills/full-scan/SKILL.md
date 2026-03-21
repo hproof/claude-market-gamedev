@@ -171,13 +171,35 @@ graph TD
 
 ## 4. 宏观依赖方向
 
+**箭头语义：`A --> B` 表示 "A 依赖于 B"（上层依赖下层）**
+
 展示模块层级间的依赖方向（不深入文件级依赖，详细依赖分析见 module 类型）：
 
 ```mermaid
 %%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 20 }}}%%
-graph LR
-    BIZ[业务层] --> CORE[底层模块] --> LIB[第三方库]
+graph BT
+    LIB[第三方库<br/>基础能力]
+    CORE[底层模块<br/>引擎/框架封装]
+    BIZ[业务层<br/>游戏逻辑]
+
+    %% 依赖方向：上层依赖于下层
+    BIZ --> CORE
+    CORE --> LIB
+
+    %% 图例
+    subgraph 依赖方向[" "]
+        direction LR
+        Upper[上层] --> Lower[下层]
+    end
+
+    style LIB fill:#e3f2fd
+    style CORE fill:#fff3e0
+    style BIZ fill:#e8f5e9
 ```
+
+**分层说明：**
+- 业务层（上层）依赖于底层模块提供的通用能力
+- 底层模块（中层）依赖于第三方库（下层）的基础功能
 
 [↑ 返回导航](#导航)
 

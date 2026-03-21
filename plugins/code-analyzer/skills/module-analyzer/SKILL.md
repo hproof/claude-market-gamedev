@@ -195,22 +195,42 @@ graph LR
 
 ### 5.1 外部关系图
 
+**箭头语义：`A --> B` 表示 "A 依赖于 B"（A 使用 B）**
+
 ```mermaid
 %%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'padding': 20, 'nodeSpacing': 40, 'rankSpacing': 60 }}}%%
 graph LR
+    %% 上游：外部模块依赖当前模块（外部模块 → 当前模块）
     ExtA[外部模块A] --> ThisMod[当前模块]
     ExtB[外部模块B] --> ThisMod
+
+    %% 下游：当前模块依赖外部模块（当前模块 → 外部模块）
     ThisMod --> ExtC[外部模块C]
     ThisMod --> ExtD[外部模块D]
+
+    %% 图例说明
+    subgraph 图例[" "]
+        direction LR
+        Upstream[外部模块] --> Target[当前模块]
+        Target --> Downstream[外部模块]
+    end
+
+    style Upstream fill:#e3f2fd
+    style Target fill:#fff3e0
+    style Downstream fill:#e8f5e9
 ```
 
 ### 5.2 被谁依赖（上游）
+
+> 上游模块引用当前模块（箭头指向当前模块）
 
 | 外部模块 | 引用方式 | 引用的子模块/类 | 说明 |
 |----------|----------|----------------|------|
 | {模块名} | include/import | `{Class}` | 用途描述 |
 
 ### 5.3 依赖谁（下游）
+
+> 当前模块引用外部模块（箭头从当前模块指出）
 
 | 外部模块 | 引用方式 | 本模块引用点 | 说明 |
 |----------|----------|-------------|------|

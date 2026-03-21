@@ -4,7 +4,7 @@ description: |
   维护 Code Analyzer 的文档清单（manifest.md）。
   在分析任务完成后由 analyst agent 调用，负责新增/更新/删除文档记录。
   不应由用户直接触发。
-allowed-tools: Read, Write, Glob
+allowed-tools: Read, Write, Edit, Glob
 disable-model-invocation: true
 ---
 
@@ -17,7 +17,7 @@ disable-model-invocation: true
 | `action` | string | 否 | 操作类型：`add`（默认）/ `update` / `delete` / `rebuild` |
 | `doc_name` | string | 条件 | 文档文件名（如 `src-structure.md`），`rebuild` 时不需要 |
 | `scope` | string | 条件 | 分析范围（如 `./src`），`rebuild` 时不需要 |
-| `type` | string | 条件 | 分析类型（`full-scan` / `structure` / `flow`），`rebuild` 时不需要 |
+| `type` | string | 条件 | 分析类型（`full-scan` / `module` / `feature`），`rebuild` 时不需要 |
 | `summary` | string | 条件 | 简要说明（限 50 字），`rebuild` 时不需要 |
 
 `rebuild` 操作不需要以上条件参数，它会自动从文件中提取所有信息。
@@ -66,14 +66,14 @@ disable-model-invocation: true
 
 解析规则：
 1. 去掉 `.md` 后缀
-2. 从末尾匹配已知类型标识：`full-scan`、`structure`、`flow`
+2. 从末尾匹配已知类型标识：`full-scan`、`module`、`feature`
 3. 剩余部分为 normalized-scope，将 `root` 还原为 `.`，将 `-` 还原为 `/`，加前导 `./`
 
 | 文件名 | type | scope |
 |--------|------|-------|
 | `root-full-scan.md` | `full-scan` | `.` |
-| `src-structure.md` | `structure` | `./src` |
-| `src-render-flow.md` | `flow` | `./src/render` |
+| `src-render-module.md` | `module` | `./src/render` |
+| `bullet-system-feature.md` | `feature` | `./src/bullet-system` |
 
 如文件名无法匹配已知类型，跳过该文件并在结果中报告。
 
@@ -104,8 +104,8 @@ disable-model-invocation: true
 
 ### 按分析类型
 - **整体扫描**: (暂无)
-- **结构分析**: (暂无)
-- **流程分析**: (暂无)
+- **模块分析**: (暂无)
+- **功能分析**: (暂无)
 
 ### 按分析范围
 - **root (.)**: (暂无)
@@ -128,8 +128,8 @@ disable-model-invocation: true
 
 ```markdown
 - **整体扫描**: [root-full-scan.md](./root-full-scan.md)
-- **结构分析**: [src-structure.md](./src-structure.md), [core-structure.md](./core-structure.md)
-- **流程分析**: (暂无)
+- **模块分析**: [src-render-module.md](./src-render-module.md), [core-module.md](./core-module.md)
+- **功能分析**: (暂无)
 ```
 
 **按分析范围**：将相同范围的文档链接归类。
@@ -144,5 +144,5 @@ disable-model-invocation: true
 | type | 显示名 |
 |------|--------|
 | `full-scan` | 整体扫描 |
-| `structure` | 结构分析 |
-| `flow` | 流程分析 |
+| `module` | 模块分析 |
+| `feature` | 功能分析 |
