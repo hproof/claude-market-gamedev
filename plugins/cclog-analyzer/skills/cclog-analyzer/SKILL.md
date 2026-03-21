@@ -16,6 +16,8 @@ allowed-tools: Read, Glob, Bash(python *), AskUserQuestion
 python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py
 ```
 
+**注意：如果脚本执行失败（返回非0退出码或输出错误信息），则停止执行并告知用户。**
+
 **输出格式：**
 ```
 session-file.jsonl|line-num|uuid|timestamp|content-preview
@@ -40,6 +42,8 @@ session-file.jsonl|line-num|uuid|timestamp|content-preview
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py {session-file} {uuid}
 ```
+
+**注意：如果脚本执行失败（返回非0退出码或输出错误信息），则停止执行并告知用户。**
 
 **输出格式：**
 ```
