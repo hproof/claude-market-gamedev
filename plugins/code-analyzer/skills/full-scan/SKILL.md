@@ -3,10 +3,10 @@ name: full-scan
 description: |
   项目整体代码扫描 Skill。负责扫描项目结构，识别模块分布（第三方库、底层模块、业务模块），
   明确各模块边界和层级关系，输出项目整体结构文档。
-  当用户需要整体了解项目架构、识别模块边界时触发。
-  适用于：项目整体架构评估、模块边界识别、初步代码审查。
+  仅由 analyst agent 调用，不应由用户直接触发。
 allowed-tools: Read, Write, Glob, Grep, Bash(*)
 disable-model-invocation: true
+user-invocable: false
 ---
 
 执行项目整体代码扫描，识别模块分布并生成项目结构文档。

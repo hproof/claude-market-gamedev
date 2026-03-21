@@ -3,10 +3,10 @@ name: feature-analyzer
 description: |
   跨模块功能/系统分析 Skill。追踪某个功能或系统跨多个模块的实现，
   分析功能入口、跨模块调用链、数据流、模块间交互关系。
-  当用户需要了解"XX功能如何实现"、"追踪XX机制"、"分析跨模块调用"时触发。
-  适用于：功能实现梳理、跨模块依赖分析、系统架构理解。
+  仅由 analyst agent 调用，不应由用户直接触发。
 allowed-tools: Read, Write, Glob, Grep, Bash(*)
 disable-model-invocation: true
+user-invocable: false
 ---
 
 对指定功能或系统进行跨模块分析，追踪其在多个模块中的实现和交互。

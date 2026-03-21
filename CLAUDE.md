@@ -57,6 +57,7 @@ Skill 指令内容...
 | `description` | 推荐 | Claude 据此判断何时使用该 Skill |
 | `allowed-tools` | 否 | Skill 激活时免审批的工具列表 |
 | `disable-model-invocation` | 否 | `true` 则只能用户手动 `/name` 触发 |
+| `user-invocable` | 否 | `false` 则不在 `/skills` 列表中显示（仅供 Agent 调用） |
 | `context` | 否 | `fork` 在独立子上下文中执行 |
 | `agent` | 否 | `context: fork` 时使用的 Agent 类型 |
 

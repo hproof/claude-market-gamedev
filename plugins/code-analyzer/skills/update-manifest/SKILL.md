@@ -6,6 +6,7 @@ description: |
   不应由用户直接触发。
 allowed-tools: Read, Write, Edit, Glob
 disable-model-invocation: true
+user-invocable: false
 ---
 
 维护 `./docs/code-analyzer/manifest.md` 文档清单。
