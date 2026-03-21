@@ -29,51 +29,50 @@ def main():
     log_dir = log_file.parent
     session_name = log_file.stem
 
-    # 1. 找到目标提问的行号
-    target_line_num = -1
+    # 1. 读取所有行到内存
     with open(log_file, 'r', encoding='utf-8') as f:
-        for i, line in enumerate(f):
-            if f'"uuid":"{target_uuid}"' in line and '"type":"user"' in line:
-                target_line_num = i
-                break
+        all_lines = [line.rstrip('\n\r') for line in f]
+
+    # 2. 找到目标提问的行号
+    target_line_num = -1
+    for i, line in enumerate(all_lines):
+        if f'"uuid":"{target_uuid}"' in line and '"type":"user"' in line:
+            target_line_num = i
+            break
 
     if target_line_num == -1:
         print(f"错误: 找不到指定的提问 UUID: {target_uuid}", file=sys.stderr)
         sys.exit(1)
 
-    # 2. 从目标行开始往下遍历，收集相关记录
+    # 3. 从目标行开始往下遍历，收集相关记录
     related_uuids = {target_uuid}  # 当前执行树中的所有 uuid
     agent_ids = set()  # 收集子代理 id
 
-    with open(log_file, 'r', encoding='utf-8') as f:
-        for i, line in enumerate(f):
-            if i < target_line_num:
-                continue  # 跳过前面的记录
+    for i in range(target_line_num, len(all_lines)):
+        line = all_lines[i]
+        if not line.strip():
+            continue
 
-            line = line.rstrip('\n\r')
-            if not line.strip():
-                continue
+        try:
+            record = json.loads(line)
+            uuid = record.get('uuid', '')
+            parent_uuid = record.get('parentUuid', '')
 
-            try:
-                record = json.loads(line)
-                uuid = record.get('uuid', '')
-                parent_uuid = record.get('parentUuid', '')
+            # 检查是否相关：uuid 已在集合中，或 parentUuid 在集合中
+            is_related = (uuid in related_uuids) or (parent_uuid in related_uuids)
 
-                # 检查是否相关：uuid 已在集合中，或 parentUuid 在集合中
-                is_related = (uuid in related_uuids) or (parent_uuid in related_uuids)
+            if is_related:
+                print(line)
+                related_uuids.add(uuid)
 
-                if is_related:
-                    print(line)
-                    related_uuids.add(uuid)
+                # 提取子代理 id
+                if record.get('type') == 'progress':
+                    agent_id = record.get('data', {}).get('agentId')
+                    if agent_id:
+                        agent_ids.add(agent_id)
 
-                    # 提取子代理 id
-                    if record.get('type') == 'progress':
-                        agent_id = record.get('data', {}).get('agentId')
-                        if agent_id:
-                            agent_ids.add(agent_id)
-
-            except json.JSONDecodeError:
-                continue
+        except json.JSONDecodeError:
+            continue
 
     # 3. 输出子代理日志
     for agent_id in sorted(agent_ids):
