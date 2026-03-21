@@ -4,7 +4,7 @@ find_and_list_prompts.py
 自动获取当前工作目录，找到日志并列出所有用户提问
 
 用法: python find_and_list_prompts.py
-输出: 每行一个用户提问，格式: session-file|line-num|uuid|timestamp|content-preview
+输出: 每行一个用户提问，格式: session-file|timestamp|content-preview|uuid
 """
 
 import json
@@ -49,6 +49,58 @@ def find_latest_session_log(project_dir):
     return latest
 
 
+def is_real_user_input(record):
+    """判断是否是真正的用户输入（排除系统消息和工具结果）"""
+    message = record.get('message', {})
+    content = message.get('content', '') if isinstance(message, dict) else ''
+
+    # content 是数组的情况：检查是否包含 tool_result
+    if isinstance(content, list):
+        # 如果数组中包含 tool_result 类型，则不是真实用户输入
+        for item in content:
+            if isinstance(item, dict) and item.get('type') in ('tool_result', 'tool_use'):
+                return False
+        # 将数组转为字符串用于预览
+        return True
+
+    # content 是字符串的情况
+    if not isinstance(content, str):
+        return False
+
+    content = content.strip()
+    # 排除系统标签包裹的内容
+    if content.startswith('<local-command-caveat>'):
+        return False
+    if content.startswith('<command-name>'):
+        return False
+    if content.startswith('<local-command-'):
+        return False
+    if content.startswith('<'):
+        return False
+    return True
+
+
+def get_content_preview(record):
+    """获取内容预览"""
+    message = record.get('message', {})
+    content = message.get('content', '') if isinstance(message, dict) else ''
+
+    if isinstance(content, list):
+        # 提取数组中的文本内容
+        texts = []
+        for item in content:
+            if isinstance(item, dict):
+                if 'text' in item:
+                    texts.append(item['text'])
+                elif 'content' in item and isinstance(item['content'], str):
+                    texts.append(item['content'])
+            elif isinstance(item, str):
+                texts.append(item)
+        content = ' '.join(texts)
+
+    return str(content) if content else ''
+
+
 def extract_user_prompts(log_file):
     """提取所有用户提问"""
     prompts = []
@@ -60,14 +112,14 @@ def extract_user_prompts(log_file):
             try:
                 record = json.loads(line)
                 if record.get('type') == 'user':
+                    # 过滤非真实用户输入
+                    if not is_real_user_input(record):
+                        continue
+
+                    content = get_content_preview(record)
                     uuid = record.get('uuid', '')
                     timestamp = record.get('timestamp', '')
-                    message = record.get('message', {})
-                    content = message.get('content', '') if isinstance(message, dict) else ''
-                    # content 可能是列表或字符串
-                    if isinstance(content, list):
-                        content = json.dumps(content)
-                    preview = str(content)[:100].replace('\n', ' ') if content else ''
+                    preview = content[:100].replace('\n', ' ')
                     if len(content) > 100:
                         preview += '...'
                     prompts.append({
@@ -100,10 +152,10 @@ def main():
     # 4. 提取所有用户提问
     prompts = extract_user_prompts(latest_log)
 
-    # 5. 输出格式: session-file|line-num|uuid|timestamp|preview
+    # 5. 输出格式: session-file|timestamp|content-preview|uuid
     session_name = latest_log.name
     for prompt in prompts:
-        print(f"{session_name}|{prompt['line_num']}|{prompt['uuid']}|{prompt['timestamp']}|{prompt['preview']}")
+        print(f"{session_name}|{prompt['timestamp']}|{prompt['preview']}|{prompt['uuid']}")
 
 
 if __name__ == '__main__':

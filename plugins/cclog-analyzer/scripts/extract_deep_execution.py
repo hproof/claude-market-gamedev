@@ -4,8 +4,7 @@ extract_deep_execution.py
 自动获取当前工作目录，深度遍历提取指定提问的执行树
 
 用法: python extract_deep_execution.py <session-file> <prompt-uuid>
-输出: 深度遍历的所有记录，格式: [SOURCE]|{json-line}
-      SOURCE: MAIN 或 agent-{id}
+输出: JSON 数组，每条记录包含 _source 字段（MAIN 或 agent-{id}）
 """
 
 import json
@@ -67,6 +66,54 @@ def extract_agent_id_from_progress(record):
     return None
 
 
+# 要移除的冗余字段
+FIELDS_TO_REMOVE = {
+    'sessionId', 'parentUuid', 'uuid', 'usage', 'isSidechain',
+    'userType', 'entrypoint', 'cwd', 'version', 'gitBranch', 'slug',
+    'permissionMode', 'promptId', 'sourceToolAssistantUUID', 'toolUseResult',
+    'isMeta', 'model', 'stop_reason', 'stop_sequence', 'id'
+}
+
+# message 中要移除的字段
+MESSAGE_FIELDS_TO_REMOVE = {'usage', 'id', 'model', 'stop_reason', 'stop_sequence'}
+
+# content 数组项中要移除的字段
+CONTENT_FIELDS_TO_REMOVE = {'signature'}
+
+
+def simplify_record(record):
+    """简化记录，移除冗余字段"""
+    simplified = {}
+    for key, value in record.items():
+        if key in FIELDS_TO_REMOVE:
+            continue
+        # 简化 message
+        if key == 'message' and isinstance(value, dict):
+            msg = {k: v for k, v in value.items() if k not in MESSAGE_FIELDS_TO_REMOVE}
+            # 简化 content 数组
+            if 'content' in msg and isinstance(msg['content'], list):
+                simplified_content = []
+                for item in msg['content']:
+                    if isinstance(item, dict):
+                        simple_item = {k: v for k, v in item.items()
+                                       if k not in CONTENT_FIELDS_TO_REMOVE}
+                        simplified_content.append(simple_item)
+                    else:
+                        simplified_content.append(item)
+                msg['content'] = simplified_content
+            simplified[key] = msg
+        else:
+            simplified[key] = value
+    return simplified
+
+
+def format_record(record, source):
+    """格式化记录，简化并添加来源"""
+    simplified = simplify_record(record)
+    simplified['_source'] = source
+    return simplified
+
+
 def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=None):
     """
     深度遍历执行树
@@ -89,8 +136,9 @@ def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=No
             i += 1
             continue
 
-        # 输出当前主会话记录
-        print(f"MAIN|{raw_line}")
+        # 输出当前主会话记录（简化版）
+        formatted = format_record(record, 'MAIN')
+        print(json.dumps(formatted, ensure_ascii=False))
         related_uuids.add(uuid)
 
         # 检查是否是子代理调用
@@ -103,7 +151,12 @@ def deep_traverse(main_lines, start_idx, log_dir, session_name, related_uuids=No
                     for sub_line in f:
                         sub_line = sub_line.rstrip('\n\r')
                         if sub_line.strip():
-                            print(f"agent-{agent_id}|{sub_line}")
+                            try:
+                                sub_record = json.loads(sub_line)
+                                formatted_sub = format_record(sub_record, f'agent-{agent_id}')
+                                print(json.dumps(formatted_sub, ensure_ascii=False))
+                            except json.JSONDecodeError:
+                                continue
 
         i += 1
 

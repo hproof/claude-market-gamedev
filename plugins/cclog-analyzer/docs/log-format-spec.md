@@ -77,3 +77,36 @@
 ```
 
 子代理日志格式与主会话相同。
+
+## 脚本输出格式
+
+`find_and_list_prompts.py` 和 `extract_deep_execution.py` 会简化原始日志，输出精简后的 JSON：
+
+### find_and_list_prompts 输出
+
+```
+session-file.jsonl|timestamp|content-preview|uuid
+```
+
+### extract_deep_execution 输出
+
+```json
+{"type": "user", "message": {"role": "user", "content": "..."}, "timestamp": "...", "_source": "MAIN"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "thinking": "..."}]}, "timestamp": "...", "_source": "MAIN"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "...", "name": "...", "input": {...}}]}, "timestamp": "...", "_source": "MAIN"}
+```
+
+### 简化规则
+
+脚本会移除以下冗余字段：
+- `uuid`, `parentUuid`, `sessionId` - ID 类字段
+- `usage`, `model`, `stop_reason`, `stop_sequence` - 元数据
+- `isSidechain`, `userType`, `entrypoint`, `cwd` - 执行环境
+- `version`, `gitBranch`, `slug` - 版本信息
+- `permissionMode`, `promptId`, `sourceToolAssistantUUID` - 内部标识
+
+只保留核心字段：
+- `type` - 记录类型
+- `message.role` / `message.content` - 角色和内容
+- `timestamp` - 时间戳
+- `_source` - 来源标识（"MAIN" 或 "agent-{id}"）
