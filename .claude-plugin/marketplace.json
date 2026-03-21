@@ -13,6 +13,11 @@
       "name": "code-analyzer",
       "source": "./plugins/code-analyzer",
       "description": "游戏代码分析插件，提供整体扫描（full-scan）、结构分析（structure）、流程分析（flow）三种分析能力"
+    },
+    {
+      "name": "cclog-analyzer",
+      "source": "./plugins/cclog-analyzer",
+      "description": "分析 Claude Code 执行日志，追溯用户提问的完整执行流程"
     }
   ]
 }

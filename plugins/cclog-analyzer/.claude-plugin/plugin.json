@@ -1,0 +1,8 @@
+{
+  "name": "cclog-analyzer",
+  "description": "分析 Claude Code 执行日志，提取执行统计、工具使用情况和性能指标",
+  "version": "1.0.0",
+  "author": {
+    "name": "hproof"
+  }
+}
