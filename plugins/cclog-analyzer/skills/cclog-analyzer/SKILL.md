@@ -8,6 +8,15 @@ allowed-tools: Read, Glob, Bash(python *), AskUserQuestion
 
 # Claude Code 执行日志分析器
 
+## 日志格式规范
+
+分析日志前，请先阅读 `${CLAUDE_PLUGIN_ROOT}/docs/log-format-spec.md` 了解：
+- 日志文件组织结构
+- JSON Lines 记录格式
+- 消息类型（user/assistant/progress）
+- 关键字段（uuid, parentUuid, timestamp, agentId 等）
+- 子代理日志位置
+
 ## 执行步骤
 
 ### 步骤 1：获取用户提问列表
