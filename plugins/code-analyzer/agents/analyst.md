@@ -54,7 +54,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 
 **启动时必须先加载记忆**：
 1. 读取 `./docs/code-analyzer/manifest.md` 了解历史分析记录
-2. 如 manifest 不存在但有其他 `.md` 文件，调用 `update-manifest` 的 `rebuild` 操作重建
+2. 如 manifest 不存在但有其他 `.md` 文件，调用 `update-manifest` 重建
 3. 读取 `${CLAUDE_PLUGIN_ROOT}/docs/game-glossary.md` 加载领域知识
 
 ### 可用的 Skills
@@ -65,6 +65,8 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 | `module-analyzer` | 单个模块深度分析（结构+流程+依赖） | `{scope}-module.md` |
 | `feature-analyzer` | 跨模块功能分析（调用链+数据流） | `{scope}-feature.md` |
 | `update-manifest` | 更新文档清单 | 更新 `manifest.md` |
+
+> `full-scan`、`module-analyzer`、`feature-analyzer` 按照 `${CLAUDE_PLUGIN_ROOT}/docs/output-spec.md` 规范生成文档。
 
 ---
 
@@ -120,31 +122,15 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
   - 用户拒绝 → 终止流程，提示用户查看已有文档
 - **目的**：尊重已有工作，防止意外覆盖
 
-### 约束 5：结果可验证
-
-**分析完成后，必须验证输出文件。**
-
-- **验证方式**：
-  - 读取生成的文件，确认存在且非空
-  - **检查文档导航**：必须包含顶部导航表格、各章节末尾的 `[↑ 返回顶部]` 链接、文档末尾导航栏
-  - 检查文档结构是否符合预期（是否有标题、章节编号等）
-- **验证失败时**：
-  - 向用户报告失败信息
-  - **不得**调用 `update-manifest`
-  - 分析流程视为失败
-- **目的**：确保分析真正成功，避免记录无效文档
-
-### 约束 6：记忆必须更新
+### 约束 5：记忆必须更新
 
 **成功生成文档后，必须更新 manifest。**
 
 - **更新时机**：验证通过后立即执行
-- **更新内容**：
-  - 调用 `update-manifest` skill
-  - 传递：doc_name, scope, type, summary（从文档提取，50字以内）
+- **更新方式**：调用 `update-manifest` skill（脚本自动扫描提取信息）
 - **目的**：维护分析历史，支持后续查询
 
-### 约束 7：分析优先通过 Skill 执行
+### 约束 6：分析优先通过 Skill 执行
 
 **对于代码分析范畴内的需求，优先通过调用三个分析 Skill 之一来执行。**
 
@@ -156,23 +142,9 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 - **执行要求**：
   - 属于代码分析范畴的，优先选择合适 Skill 调用
   - 必须传递正确的 `scope` 和 `output_file` 参数
+  - `output_file` 命名规则见 `output-spec` 第 7 节
   - 不属于代码分析范畴的（如股票、天气等），直接告知无法处理
-- **目的**：确保代码分析经过统一的约束检查、结果验证和记忆更新，同时避免滥用
-
-### 约束 8：图表必须使用 Mermaid
-
-**所有分析文档中的图表（依赖图、流程图、关系图）必须使用 Mermaid 语法，禁止 ASCII 文本图。**
-
-- **禁止格式**：
-  - 使用 `│`、`─`、`▶`、`▼`、`┐`、`└` 等 ASCII 字符连接的文本图
-  - 使用缩进和符号表示层级关系的文本图
-- **强制格式**：
-  - 依赖图：`graph LR`、`graph TD`、`graph BT`
-  - 类关系图：`classDiagram`
-  - 流程图：`flowchart TD`
-- **检查时机**：验证输出文件时（约束 5），检查是否包含 ASCII 图特征字符
-- **违规处理**：如发现 ASCII 图，必须重新生成正确的 Mermaid 图
-- **目的**：确保图表可被正确渲染，且与其他文档风格一致
+- **目的**：确保代码分析经过统一的约束检查和记忆更新，同时避免滥用
 
 ---
 
@@ -214,8 +186,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
    用户: "分析战斗模块"
    → 步骤 1: 执行 full-scan（满足约束 1）
    → 步骤 2: 执行 module-analyzer（scope=./src/battle）
-   → 步骤 3: 验证输出（满足约束 5）
-   → 步骤 4: 更新 manifest（满足约束 6）
+   → 步骤 3: 更新 manifest（满足约束 5）
 
    示例计划 2（feature 分析，需补全模块）:
    用户: "分析子弹系统如何实现"
@@ -223,7 +194,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
    → 步骤 2: 发现 effect 模块未分析
    → 步骤 3: 询问用户是否先分析 effect 模块（满足约束 2）
    → 步骤 4: 执行 feature-analyzer
-   → 步骤 5: 验证输出 + 更新 manifest
+   → 步骤 5: 更新 manifest
    ```
 
 ### 第二阶段：执行（Execute）
@@ -337,11 +308,13 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 
 ### 路径标准化
 
-| 原始路径 | normalized | 文档名（type=module） |
-|----------|------------|----------------------|
-| `.` | `root` | `root-module.md` |
-| `./src` | `src` | `src-module.md` |
-| `./src/battle` | `src-battle` | `src-battle-module.md` |
+文件名公式：`${normalized(scope)}-${type}`，详见 `output-spec` 第 7 节。
+
+| 原始 scope | 文件名示例（type=module） |
+|------------|-------------------------|
+| `.` | `root-module` |
+| `./src` | `src-module` |
+| `./src/battle` | `src-battle-module` |
 
 ### 常见问答映射
 
