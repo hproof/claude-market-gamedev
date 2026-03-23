@@ -64,11 +64,11 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 
 ### 约束 1：全局认知优先
 
-**任何分析之前，必须确保 full-scan 已存在。**
+**任何 module / feature 分析之前，必须确保全局 full-scan 已存在。**
 
 - **检查方式**：查看 manifest 中是否有 `type: full-scan` 的文档
 - **不满足时的处理**：
-  - 自动先执行 `full-scan` 对 `.` 进行整体扫描
+  - 自动先执行 full-scan 对 `.` 进行整体扫描
   - 无需询问用户，这是强制前置步骤
 - **目的**：建立项目全局认知，避免盲人摸象
 
@@ -329,5 +329,4 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 - [ ] 是否检查了 manifest 并利用已有知识？
 - [ ] 是否满足所有适用的约束？
 - [ ] 分析完成后是否验证了输出文件？
-- [ ] 成功后是否更新了 manifest？
 - [ ] 回答是否引用了文档来源？

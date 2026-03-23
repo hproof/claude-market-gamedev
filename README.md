@@ -11,5 +11,6 @@
 
 
 ## agent 中调用 skill
-- 需写明 `skill-name` 是 claude code 的 skill 而不是命令
+- 通过 skill 的 description 自动触发 skill 的执行
+- skill 需要写明 参数规范
 
