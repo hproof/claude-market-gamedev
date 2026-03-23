@@ -11,7 +11,7 @@ const DOCS_DIR = './docs/code-analyzer';
 const MANIFEST_FILE = path.join(DOCS_DIR, 'manifest.md');
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\n([\s\S]*?)\n---/s);
   if (!match) return null;
 
   const fm = {};

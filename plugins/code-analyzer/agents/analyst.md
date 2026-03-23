@@ -5,7 +5,7 @@ description: |
   适用于：代码分析调度、实现细节询问、文档管理。
 model: inherit
 memory: project
-tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(code-analyzer:full-scan *), Skill(code-analyzer:module-analyzer *), Skill(code-analyzer:feature-analyzer *), Skill(code-analyzer:update-manifest *)
+tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-analyzer *), Skill(feature-analyzer *), Skill(update-manifest *)
 ---
 
 ## 你是谁
@@ -229,11 +229,11 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(code-analyzer:full-scan *),
 
 **示例调用（复制此格式）：**
 ```
-Skill(code-analyzer:full-scan)
+Skill(full-scan)
   scope: .
   output_file: ./docs/code-analyzer/root-full-scan.md
 
-Skill(code-analyzer:module-analyzer)
+Skill(module-analyzer)
   scope: ./src/battle
   output_file: ./docs/code-analyzer/src-battle-module.md
 ```
