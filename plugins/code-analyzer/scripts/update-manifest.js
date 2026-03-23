@@ -22,7 +22,11 @@ function parseFrontmatter(content) {
   for (const line of lines) {
     if (isMultiline) {
       if (line.startsWith('  ')) {
-        fm[currentKey] += '\n' + line.trim();
+        if (fm[currentKey] === '') {
+          fm[currentKey] = line.trim();
+        } else {
+          fm[currentKey] += '\n' + line.trim();
+        }
         continue;
       }
       isMultiline = false;
@@ -36,6 +40,7 @@ function parseFrontmatter(content) {
       if (value === '|') {
         fm[currentKey] = '';
         isMultiline = true;
+        continue;
       } else {
         fm[currentKey] = value.replace(/^['"]|['"]$/g, '');
       }

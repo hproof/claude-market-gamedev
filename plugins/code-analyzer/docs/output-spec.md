@@ -80,16 +80,16 @@ description: |
 
 ### 3.1 通用配置
 
-所有 Mermaid 图表必须包含初始化配置：
+所有 Mermaid 图表必须包含初始化配置（适配 Dark 模式）：
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 ```
 
 ### 3.2 流程图（graph TD/BT/LR）
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph TD
     A[节点A] --> B[节点B]
     B --> C[节点C]
@@ -98,7 +98,7 @@ graph TD
 ### 3.3 类图（classDiagram）
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true }}}%%
 classDiagram
     BaseClass <|-- DerivedClass1
     BaseClass <|-- DerivedClass2

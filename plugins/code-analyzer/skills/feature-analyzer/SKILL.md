@@ -57,8 +57,19 @@ user-invocable: false
    - 使用 🟢🟡🔴 统计问题严重程度
    - 准备架构健康度快照
 
-7. **生成分析报告**
-   - 按以下模板结构生成文档，使用 Write 工具写入 `output_file`：
+7. **生成分析报告（强制执行）**
+
+   **警告**：必须严格遵循以下模板结构，不得自由发挥。任何偏离模板的行为都是错误的。
+
+   要求：
+   - 必须使用 Write 工具将完整文档写入 `output_file`
+   - 必须包含完整的 frontmatter（YAML 头部）
+   - 必须包含导航表格和章节间导航链接
+   - 必须严格按照模板的 6 个章节顺序输出
+   - 代码链接必须使用 `[📄 描述](路径#L行号)` 格式
+   - 状态指示必须使用 🟢🟡🔴
+
+   模板如下（复制此结构，填充内容）：
 
 ```markdown
 ---
@@ -117,7 +128,7 @@ description: |
 ### 2.2 模块交互概览
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph LR
     subgraph ModuleA["模块A"]
         A[职责A]
@@ -140,7 +151,7 @@ graph LR
 ### 3.1 完整调用链
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 sequenceDiagram
     participant A as 模块A
     participant B as 模块B
@@ -178,7 +189,7 @@ sequenceDiagram
 ### 4.2 数据流转图
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph TD
     Data[数据源] -->|转换1| Proc1[处理1]
     Proc1 -->|转换2| Proc2[处理2]

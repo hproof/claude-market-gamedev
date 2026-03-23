@@ -5,7 +5,7 @@ description: |
   - 分析模式：当用户说"分析代码"、"审计项目"、"分析 XX 模块"等时触发，生成分析文档。
   - 询问模式：当用户提问"XX流程是怎样的？"、"XX模块依赖了什么？"等时触发，基于已有分析回答。
   将用户的原始查询转交给 analyst agent 进行智能处理。
-allowed-tools: Agent(analyst), Read
+allowed-tools: Agent(code-analyzer:analyst), Read
 ---
 
 启动代码分析工作流的入口 Skill。
@@ -28,11 +28,17 @@ allowed-tools: Agent(analyst), Read
 
 ### 2. 启动 Analyst Agent
 
-调用 `analyst` agent，传递：
+使用 `Agent` 工具调用 `analyst` agent：
 
-| 参数 | 值 |
-|------|-----|
-| `user_query` | 用户的完整原始输入 |
+```
+Agent(code-analyzer:analyst)
+  user_query: {用户的完整原始输入}
+```
+
+**注意**：
+- 工具名是 `Agent`（不是 Bash 或其他）
+- agent 名是 `analyst`
+- 只传递 `user_query` 一个参数
 
 ### 3. 返回结果
 

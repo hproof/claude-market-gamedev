@@ -72,8 +72,19 @@ user-invocable: false
    - 使用 🟢🟡🔴 统计各维度问题严重程度（高/中/低）
    - 准备架构健康度快照
 
-9. **生成分析报告**
-   - 按以下模板结构生成文档，使用 Write 工具写入 `output_file`：
+9. **生成分析报告（强制执行）**
+
+   **警告**：必须严格遵循以下模板结构，不得自由发挥。任何偏离模板的行为都是错误的。
+
+   要求：
+   - 必须使用 Write 工具将完整文档写入 `output_file`
+   - 必须包含完整的 frontmatter（YAML 头部）
+   - 必须包含导航表格和章节间导航链接
+   - 必须严格按照模板的 7 个章节顺序输出
+   - 代码链接必须使用 `[📄 描述](路径#L行号)` 格式
+   - 状态指示必须使用 🟢🟡🔴
+
+   模板如下（复制此结构，填充内容）：
 
 ```markdown
 ---
@@ -146,7 +157,7 @@ description: |
 ### 3.1 类图
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true }}}%%
 classDiagram
     class BaseClass {
         +method()
@@ -172,7 +183,7 @@ classDiagram
 ### 4.1 子模块依赖图
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph LR
     A[子模块A] --> B[子模块B]
     B --> C[子模块C]
@@ -205,7 +216,7 @@ graph LR
 ### 5.3 外部关系图
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph LR
     subgraph 上游
         A[模块A]
@@ -228,7 +239,7 @@ graph LR
 ### 6.1 {流程名称}
 
 ```mermaid
-%%{init: {'theme': 'base', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
 graph TD
     Start([开始]) --> Step1[步骤1]
     Step1 --> Step2[步骤2]
