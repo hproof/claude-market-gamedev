@@ -4,7 +4,6 @@ description: |
   分析当前 Claude Code 会话的执行日志，追溯用户提问的完整执行流程。
   在用户询问"分析这次执行"、"查看刚才的执行过程"、"这次 Claude 是怎么处理的"时触发。
 allowed-tools: Read, Glob, Bash(python *), AskUserQuestion
-context: fork
 ---
 
 # Claude Code 执行日志分析器
@@ -26,7 +25,15 @@ context: fork
 - `/cclog-analyzer` - 无参数，显示所有提问
 - `/cclog-analyzer 简化` - 有参数，过滤包含"简化"的提问
 
-### 步骤 1：获取用户提问列表
+### 步骤 1：输出当前会话ID
+
+开始执行时，首先向用户显示当前会话ID：
+
+```
+当前会话 ID: ${CLAUDE_SESSION_ID}
+```
+
+### 步骤 2：获取用户提问列表
 
 **调用方式（必须传入当前会话 ID）：**
 ```bash
@@ -42,7 +49,7 @@ python ${CLAUDE_PLUGIN_ROOT}/scripts/find_and_list_prompts.py ${CLAUDE_SESSION_I
 timestamp|content-preview|uuid
 ```
 
-### 步骤 2：过滤与选择
+### 步骤 3：过滤与选择
 
 **如果用户提供了参数（关键词）：**
 1. 用关键词匹配所有提问的 `content-preview`
@@ -82,7 +89,7 @@ timestamp|content-preview|uuid
 
 **获取：** `prompt-uuid`
 
-### 步骤 3：深度遍历提取执行树
+### 步骤 4：深度遍历提取执行树
 
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py ${CLAUDE_SESSION_ID} {prompt-uuid}
@@ -92,7 +99,7 @@ python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py ${CLAUDE_SESSION_
 
 **⚠️ 重要：直接解析 JSON，不要用 Python 脚本处理**
 
-步骤3的输出是 JSON Lines 格式，**直接逐行读取并解析即可**。
+步骤4的输出是 JSON Lines 格式，**直接逐行读取并解析即可**。
 - 不要写 Python 脚本来处理
 - 不要用 `python -c` 或 `python script.py` 来解析
 - 每行是一个完整 JSON 对象，直接用内置 JSON 解析
@@ -108,11 +115,11 @@ python ${CLAUDE_PLUGIN_ROOT}/scripts/extract_deep_execution.py ${CLAUDE_SESSION_
 - `"_source": "MAIN"` - 主会话记录
 - `"_source": "agent-{id}"` - 子代理记录
 
-### 步骤 4：生成 Markdown 分析报告
+### 步骤 5：生成 Markdown 分析报告
 
 **⚠️ 重要：直接逐行解析，禁止写 Python 脚本**
 
-步骤3的输出是 JSON Lines 格式，**直接读取后逐行用内置 JSON 解析即可**：
+步骤4的输出是 JSON Lines 格式，**直接读取后逐行用内置 JSON 解析即可**：
 - ❌ 禁止：写 `python script.py` 或 `python -c` 来处理
 - ❌ 禁止：调用任何外部工具来解析 JSON
 - ✅ 正确：直接逐行读取，内置解析每行 JSON

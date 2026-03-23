@@ -58,7 +58,6 @@ user-invocable: false
 
 8. **生成分析报告**
    - 输出到指定的 `output_file`
-   - **所有关系图、依赖图、流程图必须使用 Mermaid 语法**（`classDiagram` / `graph TD` / `graph LR`），禁止 ASCII 文本图
 
 9. **生成架构健康度快照**
    - 汇总第1-6章的分析结果
