@@ -1,11 +1,9 @@
 ---
 name: module-analyzer
 description: |
-  模块深度分析 Skill。对指定模块进行结构和关键流程的综合分析，包括：
-  目录结构、子模块识别、类关系、内部依赖、外部关系、关键业务流程。
-  仅由 analyst agent 调用，不应由用户直接触发。
+  模块深度分析。当用户要求"分析 XX 模块"、"深入分析 XX"、"XX 模块的结构和依赖"时触发。
+  对指定模块进行结构和关键流程的综合分析，包括目录结构、类关系、依赖和关键流程。
 allowed-tools: Read, Write, Glob, Grep, Bash(*)
-disable-model-invocation: true
 user-invocable: false
 ---
 

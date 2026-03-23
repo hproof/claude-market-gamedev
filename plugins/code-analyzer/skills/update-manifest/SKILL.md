@@ -1,11 +1,9 @@
 ---
 name: update-manifest
 description: |
-  扫描 `./docs/code-analyzer/` 目录，从所有 `.md` 文件的 frontmatter 提取元信息，
-  自动生成并更新 `manifest.md` 文档清单。
-  仅由 analyst agent 调用，不应由用户直接触发。
+  文档清单更新。当生成新的分析文档后、需要更新 manifest.md 时触发。
+  扫描 docs/code-analyzer/ 目录，从 frontmatter 提取元信息更新文档清单。
 allowed-tools: Bash(*)
-disable-model-invocation: true
 user-invocable: false
 ---
 

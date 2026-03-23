@@ -56,23 +56,6 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 2. 如 manifest 不存在但有其他 `.md` 文件，调用 `update-manifest` 重建
 3. 读取 `${CLAUDE_PLUGIN_ROOT}/docs/game-glossary.md` 加载领域知识
 
-### 可用的 Skills
-
-| Skill | 用途 | 输出 |
-|-------|------|------|
-| `full-scan` | 项目整体扫描，识别模块分布和层级关系 | `root-full-scan.md` |
-| `module-analyzer` | 单个模块深度分析（结构+流程+依赖） | `{scope}-module.md` |
-| `feature-analyzer` | 跨模块功能分析（调用链+数据流） | `{scope}-feature.md` |
-| `update-manifest` | 更新文档清单 | 更新 `manifest.md` |
-
-**重要说明：**
-- Skill 是 **Claude Code 内置工具**，通过 `Skill(name)` 语法调用
-- **不要**尝试寻找对应的 .py 文件或其他可执行脚本
-- **不要**使用 Bash 来执行任何分析相关脚本
-- Skill 的定义在 `${CLAUDE_PLUGIN_ROOT}/skills/{skill-name}/SKILL.md`
-
-> `full-scan`、`module-analyzer`、`feature-analyzer` 按照 `${CLAUDE_PLUGIN_ROOT}/docs/output-spec.md` 规范生成文档。
-
 ---
 
 ## 核心约束（不可违反）
@@ -127,25 +110,24 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
   - 用户拒绝 → 终止流程，提示用户查看已有文档
 - **目的**：尊重已有工作，防止意外覆盖
 
-### 约束 5：记忆必须更新
+### 约束 5：需要更新 manifest
 
 **成功生成文档后，必须更新 manifest。**
 
 - **更新时机**：验证通过后立即执行
-- **更新方式**：调用 `update-manifest` skill（脚本自动扫描提取信息）
+- **更新方式**：根据 skill 关联性自动触发 `Skill(update-manifest)` 调用
 - **目的**：维护分析历史，支持后续查询
 
-### 约束 6：分析优先通过 Skill 执行
+### 约束 6：分析 Skill 隐式触发
 
-**对于代码分析范畴内的需求，优先通过调用三个分析 Skill 之一来执行。**
+**对于代码分析范畴内的需求，通过 Skill description 隐式触发合适的分析 Skill。**
 
-- **适用范围**：用户意图为"分析"且属于代码分析范畴时（包括从询问流程转入的分析）
-- **可调用 Skill**：
-  - `full-scan` - 项目整体扫描
-  - `module-analyzer` - 模块深度分析
-  - `feature-analyzer` - 跨模块功能分析
+- **触发条件**：
+  - `full-scan`：用户要求分析项目结构、扫描项目、了解模块分布时
+  - `module-analyzer`：用户要求分析某模块、深入了解 XX 模块结构时
+  - `feature-analyzer`：用户询问某功能实现、追踪 XX 流程时
 - **执行要求**：
-  - 属于代码分析范畴的，优先选择合适 Skill 调用
+  - 属于代码分析范畴的，隐式触发合适 Skill
   - 必须传递正确的 `scope` 和 `output_file` 参数
   - `output_file` 命名规则见 `output-spec` 第 7 节
   - 不属于代码分析范畴的（如股票、天气等），直接告知无法处理
@@ -205,43 +187,6 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 ### 第二阶段：执行（Execute）
 
 按规划阶段的执行计划逐步执行，每步完成后打勾确认。
-
-**执行 Skill 时的参数传递规范：**
-
-调用 `full-scan`、`module-analyzer`、`feature-analyzer` 时，必须传递以下参数：
-
-| 参数 | 说明 | 示例值 |
-|------|------|--------|
-| `scope` | 分析范围（路径或功能名） | `.`、`./src/battle`、`子弹系统` |
-| `output_file` | 输出文件完整路径 | `./docs/code-analyzer/src-battle-module.md` |
-
-**输出文件命名规则**：`${normalized(scope)}-${type}.md`
-- `.` → `root`
-- `./src/battle` → `src-battle`
-
-**调用前输出日志：**
-
-在调用 Skill 之前，必须输出日志告知用户：
-
-```
-正在调用 {skill-name} 分析 {scope}，输出文件：{output_file}
-```
-
-**示例调用（复制此格式）：**
-```
-Skill(full-scan)
-  scope: .
-  output_file: ./docs/code-analyzer/root-full-scan.md
-
-Skill(module-analyzer)
-  scope: ./src/battle
-  output_file: ./docs/code-analyzer/src-battle-module.md
-```
-
-**警告：**
-- 只能使用 `Skill(name)` 语法调用
-- **禁止**使用 `Bash(python ...)` 或任何脚本调用方式
-- **禁止**寻找或执行任何 `.py`、`.js`、`.sh` 文件来执行分析
 
 **生成后验证：**
 - [ ] 文件是否写入成功
