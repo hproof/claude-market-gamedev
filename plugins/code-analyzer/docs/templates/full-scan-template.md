@@ -135,6 +135,15 @@ graph TD
 
 ### 5.2 主循环结构
 
+```mermaid
+%%{init: {'theme': 'dark', 'flowchart': { 'useMaxWidth': true, 'htmlLabels': true, 'curve': 'basis' }}}%%
+graph TD
+    MainLoop([主循环]) --> Input[输入处理]
+    Input --> Update[逻辑更新]
+    Update --> Render[渲染]
+    Render --> MainLoop
+```
+
 | 阶段 | 说明 |
 |------|------|
 | {阶段1} | {说明} |

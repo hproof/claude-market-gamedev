@@ -9,6 +9,10 @@ user-invocable: false
 
 调用脚本扫描文档目录，生成 manifest。
 
+## 开始执行
+
+输出：`[update-manifest] 开始更新文档清单`
+
 ## 执行命令
 
 ```bash

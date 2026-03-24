@@ -65,13 +65,15 @@ skills: full-scan, module-analyzer, feature-analyzer, update-manifest
 
 ### 约束 1：全局认知优先
 
-**任何 module / feature 分析之前，必须确保全局 full-scan 已存在。**
+**执行任何 module 或 feature 分析之前，必须先确保项目已完成 full-scan。**
 
-- **检查方式**：查看 manifest 中是否有 `type: full-scan` 的文档
-- **不满足时的处理**：
-  - 自动先执行 full-scan 对 `.` 进行整体扫描
-  - 无需询问用户，这是强制前置步骤
-- **目的**：建立项目全局认知，避免盲人摸象
+**强制步骤**：
+1. 检查 `./docs/code-analyzer/root-full-scan.md` 是否存在
+2. **不存在** → **必须立即执行 full-scan**，这是前置条件，不可跳过
+3. **存在但 manifest.md 不存在** → 调用 `update-manifest` 初始化清单
+4. 只有 full-scan 完成后，才能继续执行 module 或 feature 分析
+
+**目的**：建立项目全局认知，避免盲人摸象
 
 ### 约束 2：模块基础优先
 
