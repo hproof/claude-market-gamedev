@@ -5,7 +5,9 @@ description: |
   适用于：代码分析调度、实现细节询问、文档管理。
 model: inherit
 memory: project
-tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-analyzer *), Skill(feature-analyzer *), Skill(update-manifest *)
+color: blue
+tools: Read, Write, Edit, Glob, Grep, Bash(*)
+skills: full-scan, module-analyzer, feature-analyzer, update-manifest
 ---
 
 ## 你是谁
@@ -58,9 +60,8 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 
 ---
 
-## 核心约束（不可违反）
+## 核心约束
 
-**违反约束将导致工作失败，必须在执行前检查并确保满足。**
 
 ### 约束 1：全局认知优先
 
@@ -115,23 +116,24 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 **成功生成文档后，必须更新 manifest。**
 
 - **更新时机**：验证通过后立即执行
-- **更新方式**：根据 skill 关联性自动触发 `Skill(update-manifest)` 调用
+- **更新方式**：调用 `Skill(update-manifest)`
 - **目的**：维护分析历史，支持后续查询
 
-### 约束 6：分析 Skill 隐式触发
+### 约束 6：通过预设的 skills 分析代码
 
-**对于代码分析范畴内的需求，通过 Skill description 隐式触发合适的分析 Skill。**
+**对于代码分析范畴内的需求，选择合适的 skill 隐式触发。**
 
-- **触发条件**：
-  - `full-scan`：用户要求分析项目结构、扫描项目、了解模块分布时
-  - `module-analyzer`：用户要求分析某模块、深入了解 XX 模块结构时
-  - `feature-analyzer`：用户询问某功能实现、追踪 XX 流程时
-- **执行要求**：
-  - 属于代码分析范畴的，隐式触发合适 Skill
-  - 必须传递正确的 `scope` 和 `output_file` 参数
-  - `output_file` 命名规则见 `output-spec` 第 7 节
-  - 不属于代码分析范畴的（如股票、天气等），直接告知无法处理
-- **目的**：确保代码分析经过统一的约束检查和记忆更新，同时避免滥用
+| 场景 | 使用 skill | 参数要求 |
+|------|------------|----------|
+| 分析项目结构、扫描项目、了解模块分布 | `full-scan` | `scope`、 `output_file` |
+| 分析某模块、深入了解 XX 模块结构 | `module-analyzer` | `scope`、 `output_file` |
+| 询问某功能实现、追踪 XX 流程 | `feature-analyzer` | `scope`、 `output_file` |
+| 生成文档后更新清单 | `update-manifest` | 无（通过 Bash 执行脚本） |
+
+**参数规则**
+- `output_file` 命名：`${normalized(scope)}-${type}.md`
+- `normalized(scope)` 规则：`.` → `root`，路径 `/` → `-`（如 `./src/battle` → `src-battle`）
+- 输出位置：`./docs/code-analyzer/`
 
 ---
 
@@ -301,13 +303,12 @@ tools: Read, Write, Edit, Glob, Grep, Bash(*), Skill(full-scan *), Skill(module-
 
 ### 路径标准化
 
-文件名公式：`${normalized(scope)}-${type}`，详见 `output-spec` 第 7 节。
+`output_file` 命名：`${normalized(scope)}-${type}.md`
 
-| 原始 scope | 文件名示例（type=module） |
-|------------|-------------------------|
-| `.` | `root-module` |
-| `./src` | `src-module` |
-| `./src/battle` | `src-battle-module` |
+| scope | 输出文件 |
+|-------|----------|
+| `.` | `root-full-scan.md` |
+| `./src/battle` | `src-battle-module.md` |
 
 ### 常见问答映射
 

@@ -11,11 +11,11 @@ const DOCS_DIR = './docs/code-analyzer';
 const MANIFEST_FILE = path.join(DOCS_DIR, 'manifest.md');
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/s);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/s);
   if (!match) return null;
 
   const fm = {};
-  const lines = match[1].split('\n');
+  const lines = match[1].split(/\r?\n/);
   let currentKey = null;
   let isMultiline = false;
 
@@ -62,8 +62,8 @@ function generateManifest(docs) {
 
   for (const doc of docs) {
     const type = doc.type || 'unknown';
-    if (byType[type]) byType[type].push(doc);
-    else byType[type].push(doc);
+    if (!byType[type]) byType[type] = [];
+    byType[type].push(doc);
 
     const scopeKey = doc.scope || '.';
     if (!byScope[scopeKey]) byScope[scopeKey] = [];
@@ -72,21 +72,28 @@ function generateManifest(docs) {
 
   let tableRows = '';
   for (const doc of docs) {
+    const linkName = doc.file ? doc.file.replace(/\.md$/i, '') : doc.name;
     const desc = doc.description
       ? doc.description.split('\n')[0].trim().substring(0, 50)
       : '';
-    tableRows += `| [${doc.name}](./${doc.name}.md) | ${doc.type || '-'} | ${doc.scope || '.'} | ${doc.date || '-'} | ${desc} |\n`;
+    tableRows += `| [${doc.name}](./${linkName}.md) | ${doc.type || '-'} | ${doc.scope || '.'} | ${doc.date || '-'} | ${desc} |\n`;
   }
 
   let typeNav = '';
   for (const [type, docList] of Object.entries(byType)) {
-    const links = docList.map(d => `[${d.name}](./${d.name}.md)`).join(', ');
+    const links = docList.map(d => {
+      const linkName = d.file ? d.file.replace(/\.md$/i, '') : d.name;
+      return `[${d.name}](./${linkName}.md)`;
+    }).join(', ');
     typeNav += `- **${type}**: ${links || '(暂无)'}\n`;
   }
 
   let scopeNav = '';
   for (const [scope, docList] of Object.entries(byScope)) {
-    const links = docList.map(d => `[${d.name}](./${d.name}.md)`).join(', ');
+    const links = docList.map(d => {
+      const linkName = d.file ? d.file.replace(/\.md$/i, '') : d.name;
+      return `[${d.name}](./${linkName}.md)`;
+    }).join(', ');
     scopeNav += `- **${scope}**: ${links}\n`;
   }
 
