@@ -28,9 +28,8 @@ plugin 目录: `${CLAUDE_PLUGIN_ROOT}`
 2. **启动游戏逻辑**
 
 2.1 **初始化**
-调用脚本 `${CLAUDE_SKILL_DIR}/scripts/generate-number.ps1` 生成一个随机数
+* 使用 PS1 脚本 `scripts/generate-number.ps1` 获取一个随机数
 
 2.2 **交互循环**
   * 提示用户输入数字
-  * 调用脚本 `${CLAUDE_SKILL_DIR}/scripts/read-number.ps1` 读入随机数
   * 比较用户输入的数字和随机数, 回答 “太大了” “太小了” 或 “恭喜你猜对了”
