@@ -173,6 +173,8 @@ Your skill instructions here...
 
 | ${CLAUDE_SKILL_DIR} | The directory containing the skill’s SKILL.md file. For plugin skills, this is the skill’s subdirectory within the plugin, not the plugin root. Use this in bash injection commands to reference scripts or files bundled with the skill, regardless of the current working directory. |
 
+| ${CLAUDE_PROJECT_ROOT} | The root directory of the project where Claude Code is running. Use this to write files to the project root, regardless of the current working directory. |
+
 ```
 ---
 name: session-logger
