@@ -1,0 +1,10 @@
+{
+  "name": "hello",
+  "description": "简单的问候插件，用于向用户问好并显示系统信息",
+  "version": "1.0.0",
+  "author": {
+    "name": "hproof",
+    "email": "hproof@qq.com"
+  },
+  "skills": "./skills/"
+}
